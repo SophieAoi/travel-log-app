@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { Logo } from "../components/Logo";
-import { BeachScene } from "../components/BeachScene";
 
 export function Login() {
   const { login } = useAuth();
@@ -29,7 +28,6 @@ export function Login() {
 
   return (
     <div className="auth-shell">
-      <BeachScene />
       <div className="auth-page">
         <Logo />
         <div className="auth-card">

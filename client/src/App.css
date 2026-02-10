@@ -460,14 +460,17 @@ a.stat:hover {
   flex-shrink: 0;
 }
 
-/* Hero (auth pages) — aerial ocean/beach theme */
+/* Hero (auth pages) — animated gradient, matching the app palette */
 
-@keyframes ripple-drift {
-  from {
-    transform: translateY(-40%);
+@keyframes gradient-drift {
+  0% {
+    background-position: 0% 30%;
   }
-  to {
-    transform: translateY(40%);
+  50% {
+    background-position: 100% 70%;
+  }
+  100% {
+    background-position: 0% 30%;
   }
 }
 
@@ -476,58 +479,12 @@ a.stat:hover {
   min-height: 100vh;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #0c4a72 0%, #1c7ed6 35%, #4fb3d9 68%, #8fd0e0 88%, #f3e2b3 100%);
+  background: var(--gradient-vivid);
+  background-size: 300% 300%;
+  animation: gradient-drift 18s ease-in-out infinite;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.beach-scene {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-
-.ocean-ripple {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 26vh;
-  min-height: 160px;
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.4);
-  stroke-width: 3;
-  stroke-linecap: round;
-}
-
-.ripple-1 {
-  top: -6vh;
-  stroke: rgba(255, 255, 255, 0.3);
-  animation: ripple-drift 14s ease-in-out infinite alternate;
-}
-
-.ripple-2 {
-  top: 24vh;
-  stroke: rgba(255, 255, 255, 0.45);
-  animation: ripple-drift 18s ease-in-out infinite alternate;
-  animation-delay: -4s;
-}
-
-.ripple-3 {
-  top: 52vh;
-  stroke: rgba(255, 255, 255, 0.5);
-  animation: ripple-drift 11s ease-in-out infinite alternate;
-  animation-delay: -8s;
-}
-
-.beach-sand-bottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 16vh;
-  min-height: 110px;
-  fill: #f3e2b3;
 }
 
 .auth-page {
