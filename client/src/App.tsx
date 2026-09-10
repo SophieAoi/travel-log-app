@@ -7,6 +7,7 @@ import { Signup } from "./pages/Signup";
 import { Dashboard } from "./pages/Dashboard";
 import { Places } from "./pages/Places";
 import { PlaceDetail } from "./pages/PlaceDetail";
+import { CountryAlbum } from "./pages/CountryAlbum";
 import { SharedPlace } from "./pages/SharedPlace";
 import "./App.css";
 
@@ -32,6 +33,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Places />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/countries/:code"
+            element={
+              <ProtectedRoute>
+                <CountryAlbum />
               </ProtectedRoute>
             }
           />
