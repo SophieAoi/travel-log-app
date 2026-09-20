@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  displayName  String
+  createdAt    DateTime @default(now())
+
+  visitedCountries VisitedCountry[]
+  places           Place[]
+  shares           Share[]
+}
+
+model VisitedCountry {
+  id          String   @id @default(uuid())
+  countryCode String
+  visitedAt   DateTime?
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@unique([userId, countryCode])
+}
+
+model Place {
+  id          String   @id @default(uuid())
+  name        String
+  countryCode String
+  latitude    Float?
+  longitude   Float?
+  description String?
+  visitedAt   DateTime?
+  createdAt   DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  media  Media[]
+  shares Share[]
+}
+
+model Media {
+  id        String   @id @default(uuid())
+  url       String
+  type      MediaType
+  createdAt DateTime @default(now())
+
+  place   Place  @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  placeId String
+}
+
+enum MediaType {
+  PHOTO
+  VIDEO
+}
+
+model Share {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  place   Place  @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  placeId String
+
+  sharedBy   User   @relation(fields: [sharedById], references: [id], onDelete: Cascade)
+  sharedById String
+
+  recipientEmail String?
+}
