@@ -5,4 +5,5 @@ build/
 .env.local
 *.log
 .DS_Store
-uploads/
+server/uploads/*
+!server/uploads/.gitkeep
