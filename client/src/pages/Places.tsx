@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { MapPinned, Plus, Image as ImageIcon } from "lucide-react";
 import { api } from "../api/client";
 
 interface Place {
@@ -9,6 +10,8 @@ interface Place {
   description: string | null;
   media: { id: string; url: string; type: string }[];
 }
+
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:4000";
 
 export function Places() {
   const [places, setPlaces] = useState<Place[]>([]);
@@ -34,27 +37,46 @@ export function Places() {
 
   return (
     <div className="page">
-      <h1>Places</h1>
+      <div className="page-header">
+        <h1>
+          <MapPinned size={26} color="var(--color-accent)" /> Places
+        </h1>
+      </div>
+      <p className="page-subtitle">Every spot worth remembering, with the photos to prove it.</p>
 
       <form onSubmit={addPlace} className="inline-form">
         <input placeholder="Place name" value={name} onChange={(e) => setName(e.target.value)} />
         <input placeholder="Country code" value={countryCode} onChange={(e) => setCountryCode(e.target.value)} maxLength={2} />
-        <button type="submit">Add place</button>
+        <button type="submit">
+          <Plus size={16} /> Add place
+        </button>
       </form>
 
       {loading ? (
-        <p>Loading...</p>
+        <p className="muted">Loading…</p>
       ) : places.length === 0 ? (
-        <p>No places saved yet.</p>
+        <div className="empty-state">
+          <MapPinned size={36} />
+          <p>No places saved yet.</p>
+        </div>
       ) : (
-        <ul className="place-list">
-          {places.map((p) => (
-            <li key={p.id}>
-              <Link to={`/places/${p.id}`}>
-                {p.name} <span className="muted">({p.countryCode})</span>
-              </Link>
-            </li>
-          ))}
+        <ul className="place-cards">
+          {places.map((p, i) => {
+            const cover = p.media.find((m) => m.type === "PHOTO");
+            return (
+              <li key={p.id} className="place-card" style={{ animationDelay: `${i * 0.04}s` }}>
+                <Link to={`/places/${p.id}`}>
+                  <div className="place-thumb">
+                    {cover ? <img src={`${API_BASE}${cover.url}`} alt="" /> : <ImageIcon size={28} />}
+                  </div>
+                  <div className="place-card-body">
+                    <h3>{p.name}</h3>
+                    <p className="muted">{p.countryCode}</p>
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
