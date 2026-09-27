@@ -1,30 +1,37 @@
 export function BeachScene() {
   return (
-    <div className="beach-scene" aria-hidden="true">
-      <div className="beach-sun" />
+    <div className="beach-scene beach-scene-aerial" aria-hidden="true">
       <svg
-        className="beach-wave beach-wave-back"
+        className="ocean-ripple ripple-1"
         viewBox="0 0 1440 220"
         preserveAspectRatio="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <path d="M0,120 C240,180 480,60 720,110 C960,160 1200,80 1440,130 L1440,220 L0,220 Z" />
+        <path d="M0,40 C240,80 480,10 720,50 C960,90 1200,20 1440,60" />
       </svg>
       <svg
-        className="beach-wave beach-wave-front"
+        className="ocean-ripple ripple-2"
         viewBox="0 0 1440 220"
         preserveAspectRatio="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <path d="M0,140 C220,90 460,170 720,130 C980,90 1220,170 1440,120 L1440,220 L0,220 Z" />
+        <path d="M0,100 C220,60 460,140 720,100 C980,60 1220,140 1440,100" />
       </svg>
       <svg
-        className="beach-sand"
+        className="ocean-ripple ripple-3"
+        viewBox="0 0 1440 220"
+        preserveAspectRatio="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M0,150 C260,190 500,120 720,160 C960,200 1200,130 1440,170" />
+      </svg>
+      <svg
+        className="beach-sand beach-sand-bottom"
         viewBox="0 0 1440 140"
         preserveAspectRatio="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <path d="M0,60 C240,20 480,90 720,50 C960,10 1200,70 1440,40 L1440,140 L0,140 Z" />
+        <path d="M0,80 C240,40 480,110 720,70 C960,30 1200,90 1440,60 L1440,140 L0,140 Z" />
       </svg>
     </div>
   );
