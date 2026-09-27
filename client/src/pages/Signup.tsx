@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Mail, Lock, User, UserPlus } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { Logo } from "../components/Logo";
+import { BeachScene } from "../components/BeachScene";
 
 export function Signup() {
   const { signup } = useAuth();
@@ -28,61 +29,64 @@ export function Signup() {
   }
 
   return (
-    <div className="auth-page">
-      <Logo />
-      <div className="auth-card">
-        <h1>Start your log</h1>
-        <p className="subtitle">Track countries, save places, and share the trip.</p>
-        <form onSubmit={handleSubmit}>
-          <div className="field">
-            <label htmlFor="name">Name</label>
-            <div className="input-wrap">
-              <User size={16} />
-              <input
-                id="name"
-                placeholder="Jamie Rivera"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                required
-              />
+    <div className="auth-shell">
+      <BeachScene />
+      <div className="auth-page">
+        <Logo />
+        <div className="auth-card">
+          <h1>Start your log</h1>
+          <p className="subtitle">Track countries, save places, and share the trip.</p>
+          <form onSubmit={handleSubmit}>
+            <div className="field">
+              <label htmlFor="name">Name</label>
+              <div className="input-wrap">
+                <User size={16} />
+                <input
+                  id="name"
+                  placeholder="Jamie Rivera"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  required
+                />
+              </div>
             </div>
-          </div>
-          <div className="field">
-            <label htmlFor="email">Email</label>
-            <div className="input-wrap">
-              <Mail size={16} />
-              <input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+            <div className="field">
+              <label htmlFor="email">Email</label>
+              <div className="input-wrap">
+                <Mail size={16} />
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
             </div>
-          </div>
-          <div className="field">
-            <label htmlFor="password">Password</label>
-            <div className="input-wrap">
-              <Lock size={16} />
-              <input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+            <div className="field">
+              <label htmlFor="password">Password</label>
+              <div className="input-wrap">
+                <Lock size={16} />
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
             </div>
-          </div>
-          {error && <p className="error">{error}</p>}
-          <button type="submit" className="full-width" disabled={submitting}>
-            <UserPlus size={16} /> {submitting ? "Creating account…" : "Sign up"}
-          </button>
-        </form>
-        <p className="switch-link">
-          Already have an account? <Link to="/login">Log in</Link>
-        </p>
+            {error && <p className="error">{error}</p>}
+            <button type="submit" className="full-width" disabled={submitting}>
+              <UserPlus size={16} /> {submitting ? "Creating account…" : "Sign up"}
+            </button>
+          </form>
+          <p className="switch-link">
+            Already have an account? <Link to="/login">Log in</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

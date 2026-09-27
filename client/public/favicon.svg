@@ -1,5 +1,9 @@
 <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="32" cy="32" r="30" fill="#0d9488"/>
-  <path d="M32 12c-8.837 0-16 7.163-16 16 0 11 16 24 16 24s16-13 16-24c0-8.837-7.163-16-16-16z" fill="#fff"/>
-  <circle cx="32" cy="28" r="6" fill="#0d9488"/>
+  <circle cx="32" cy="32" r="30" fill="#1c7ed6"/>
+  <g transform="translate(32 32) rotate(45) translate(-32 -32)">
+    <path
+      d="M32 12l4 4v10l10 6v4l-10-2v6l4 4v3l-8-2-8 2v-3l4-4v-6l-10 2v-4l10-6V16l4-4z"
+      fill="#fff"
+    />
+  </g>
 </svg>
