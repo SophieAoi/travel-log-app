@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { MapPin, Camera, UserRound } from "lucide-react";
 import { api } from "../api/client";
+import { Logo } from "../components/Logo";
 
 interface Media {
   id: string;
@@ -31,40 +32,48 @@ export function SharedPlace() {
   const coverPhoto = data.place.media.find((m) => m.type === "PHOTO");
 
   return (
-    <div className="page">
-      <p className="shared-banner">
-        <UserRound size={15} /> Shared by {data.sharedBy}
-      </p>
+    <>
+      <div className="shared-topbar">
+        <Logo />
+      </div>
 
-      <div className="place-hero">
+      <div className="detail-hero">
         {coverPhoto ? (
-          <img src={`${API_BASE}${coverPhoto.url}`} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <img src={`${API_BASE}${coverPhoto.url}`} alt="" />
         ) : (
-          <Camera size={40} />
+          <div className="detail-hero-placeholder">
+            <Camera size={44} />
+          </div>
+        )}
+        <div className="detail-hero-scrim" />
+        <div className="detail-hero-caption">
+          <span className="badge badge-on-photo">
+            <MapPin size={13} /> {data.place.countryCode}
+          </span>
+          <h1>{data.place.name}</h1>
+        </div>
+      </div>
+
+      <div className="page">
+        <p className="shared-banner">
+          <UserRound size={15} /> Shared by {data.sharedBy}
+        </p>
+        {data.place.description && <p className="place-description">{data.place.description}</p>}
+
+        {data.place.media.length > 0 && (
+          <div className="media-grid">
+            {data.place.media.map((m) => (
+              <figure key={m.id}>
+                {m.type === "PHOTO" ? (
+                  <img src={`${API_BASE}${m.url}`} alt="" />
+                ) : (
+                  <video src={`${API_BASE}${m.url}`} controls />
+                )}
+              </figure>
+            ))}
+          </div>
         )}
       </div>
-
-      <div className="place-title-row">
-        <h1 style={{ margin: 0 }}>{data.place.name}</h1>
-        <span className="badge">
-          <MapPin size={13} /> {data.place.countryCode}
-        </span>
-      </div>
-      {data.place.description && <p>{data.place.description}</p>}
-
-      {data.place.media.length > 0 && (
-        <div className="media-grid">
-          {data.place.media.map((m) => (
-            <figure key={m.id}>
-              {m.type === "PHOTO" ? (
-                <img src={`${API_BASE}${m.url}`} alt="" />
-              ) : (
-                <video src={`${API_BASE}${m.url}`} controls />
-              )}
-            </figure>
-          ))}
-        </div>
-      )}
-    </div>
+    </>
   );
 }
