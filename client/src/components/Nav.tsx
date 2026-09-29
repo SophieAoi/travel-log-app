@@ -18,12 +18,14 @@ export function Nav() {
         <Logo />
       </Link>
 
-      <Link to="/" className={`nav-link ${location.pathname === "/" ? "active" : ""}`}>
-        <Globe2 size={17} /> Countries
-      </Link>
-      <Link to="/places" className={`nav-link ${location.pathname.startsWith("/places") ? "active" : ""}`}>
-        <MapPinned size={17} /> Places
-      </Link>
+      <div className="nav-links">
+        <Link to="/" className={`nav-link ${location.pathname === "/" ? "active" : ""}`}>
+          <Globe2 size={16} /> Countries
+        </Link>
+        <Link to="/places" className={`nav-link ${location.pathname.startsWith("/places") ? "active" : ""}`}>
+          <MapPinned size={16} /> Places
+        </Link>
+      </div>
 
       <span className="spacer" />
 
