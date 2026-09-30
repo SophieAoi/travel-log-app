@@ -30,6 +30,8 @@
   --color-coral: #f2704a;
   --color-coral-soft: #fdece5;
   --color-error: #c8402f;
+  --gradient-vivid: linear-gradient(135deg, #4f5bd5 0%, #962fbf 25%, #d62976 50%, #fa7e1e 75%, #feda75 100%);
+  --gradient-vivid-soft: linear-gradient(135deg, #eef0fd 0%, #f6ecf9 25%, #fdeef2 50%, #fef2e6 75%, #fffaeb 100%);
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 22px;
@@ -85,7 +87,7 @@ a {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--color-accent);
+  background: var(--gradient-vivid);
   color: white;
   flex-shrink: 0;
 }
@@ -133,7 +135,7 @@ a {
 
 .nav-link.active {
   color: white;
-  background: var(--color-accent);
+  background: var(--gradient-vivid);
   box-shadow: var(--shadow-sm);
 }
 
@@ -148,16 +150,25 @@ a {
 }
 
 .avatar {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: var(--color-accent-soft);
-  color: var(--color-accent-dark);
+  padding: 2px;
+  background: var(--gradient-vivid);
+  flex-shrink: 0;
+}
+
+.avatar span {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 0.85rem;
+  font-weight: 700;
+  font-size: 0.8rem;
 }
 
 .icon-button {
@@ -219,8 +230,8 @@ a {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 70% 100% at 20% 0%, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 60%),
-    linear-gradient(135deg, #0f5c8c 0%, #1c7ed6 55%, #4fb3d9 100%);
+    radial-gradient(ellipse 70% 100% at 20% 0%, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 60%),
+    var(--gradient-vivid);
   padding: 2.5rem 2rem 4.5rem;
   text-align: center;
 }
@@ -488,7 +499,9 @@ button {
   padding: 0.6rem 1.2rem;
   border-radius: var(--radius-sm);
   border: none;
-  background: var(--color-accent);
+  background: var(--gradient-vivid);
+  background-size: 160% 160%;
+  background-position: 0% 50%;
   color: white;
   cursor: pointer;
   font-family: inherit;
@@ -497,12 +510,12 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  transition: background 0.2s var(--ease), transform 0.15s var(--ease), box-shadow 0.2s var(--ease);
+  transition: background-position 0.4s var(--ease), transform 0.15s var(--ease), box-shadow 0.2s var(--ease);
 }
 
 button:hover {
-  background: var(--color-accent-dark);
-  box-shadow: var(--shadow-sm);
+  background-position: 100% 50%;
+  box-shadow: var(--shadow-md);
 }
 
 button:active {
@@ -603,12 +616,17 @@ button.ghost-danger:hover {
   border-radius: var(--radius-md);
   padding: 0.75rem 0.9rem;
   animation: fade-up 0.3s var(--ease) both;
-  transition: box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
+  transition: box-shadow 0.2s var(--ease), transform 0.2s var(--ease), border-color 0.2s var(--ease);
 }
 
 .country-chip:hover {
-  box-shadow: var(--shadow-sm);
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: transparent;
+  background:
+    linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
+    var(--gradient-vivid) border-box;
+  border: 1.5px solid transparent;
 }
 
 .country-chip .flag {

@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { MapPinned, Plus, Image as ImageIcon } from "lucide-react";
+import { MapPinned, Plus, Image as ImageIcon, MapPin, Images } from "lucide-react";
 import { api } from "../api/client";
 
 interface Place {
@@ -63,15 +63,24 @@ export function Places() {
         <ul className="place-cards">
           {places.map((p, i) => {
             const cover = p.media.find((m) => m.type === "PHOTO");
+            const mediaCount = p.media.length;
             return (
               <li key={p.id} className="place-card" style={{ animationDelay: `${i * 0.04}s` }}>
                 <Link to={`/places/${p.id}`}>
                   <div className="place-thumb">
-                    {cover ? <img src={`${API_BASE}${cover.url}`} alt="" /> : <ImageIcon size={28} />}
-                  </div>
-                  <div className="place-card-body">
-                    <h3>{p.name}</h3>
-                    <p className="muted">{p.countryCode}</p>
+                    {cover ? <img src={`${API_BASE}${cover.url}`} alt="" /> : <ImageIcon size={30} />}
+                    <div className="place-thumb-overlay" />
+                    {mediaCount > 0 && (
+                      <span className="place-thumb-count">
+                        <Images size={12} /> {mediaCount}
+                      </span>
+                    )}
+                    <div className="place-thumb-caption">
+                      <h3>{p.name}</h3>
+                      <span className="place-thumb-loc">
+                        <MapPin size={12} /> {p.countryCode}
+                      </span>
+                    </div>
                   </div>
                 </Link>
               </li>

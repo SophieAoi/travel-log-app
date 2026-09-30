@@ -52,58 +52,61 @@ export function PlaceDetail() {
   const coverPhoto = place.media.find((m) => m.type === "PHOTO");
 
   return (
-    <div className="page">
-      <Link to="/places" className="nav-link" style={{ display: "inline-flex", marginBottom: "1rem" }}>
-        <ArrowLeft size={16} /> Back to places
-      </Link>
-
-      <div className="place-hero">
+    <>
+      <div className="detail-hero">
         {coverPhoto ? (
-          <img src={`${API_BASE}${coverPhoto.url}`} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <img src={`${API_BASE}${coverPhoto.url}`} alt="" />
         ) : (
-          <Camera size={40} />
+          <div className="detail-hero-placeholder">
+            <Camera size={44} />
+          </div>
+        )}
+        <div className="detail-hero-scrim" />
+        <Link to="/places" className="detail-back">
+          <ArrowLeft size={16} /> Places
+        </Link>
+        <div className="detail-hero-caption">
+          <span className="badge badge-on-photo">
+            <MapPin size={13} /> {place.countryCode}
+          </span>
+          <h1>{place.name}</h1>
+        </div>
+      </div>
+
+      <div className="page">
+        {place.description && <p className="place-description">{place.description}</p>}
+
+        <div className="actions-row">
+          <label className="upload-button">
+            <ImagePlus size={17} /> {uploading ? "Uploading…" : "Add photo or video"}
+            <input type="file" accept="image/*,video/*" onChange={handleUpload} hidden disabled={uploading} />
+          </label>
+          <button onClick={handleShare} className="secondary">
+            <Share2 size={16} /> Share this place
+          </button>
+        </div>
+
+        {shareLink && (
+          <div className="share-link-box">
+            <Share2 size={15} />
+            <a href={shareLink}>{shareLink}</a>
+          </div>
+        )}
+
+        {place.media.length > 0 && (
+          <div className="media-grid">
+            {place.media.map((m) => (
+              <figure key={m.id}>
+                {m.type === "PHOTO" ? (
+                  <img src={`${API_BASE}${m.url}`} alt="" />
+                ) : (
+                  <video src={`${API_BASE}${m.url}`} controls />
+                )}
+              </figure>
+            ))}
+          </div>
         )}
       </div>
-
-      <div className="place-title-row">
-        <h1 style={{ margin: 0 }}>{place.name}</h1>
-        <span className="badge">
-          <MapPin size={13} /> {place.countryCode}
-        </span>
-      </div>
-      {place.description && <p>{place.description}</p>}
-
-      <label className="upload-button">
-        <ImagePlus size={17} /> {uploading ? "Uploading…" : "Add photo or video"}
-        <input type="file" accept="image/*,video/*" onChange={handleUpload} hidden disabled={uploading} />
-      </label>
-
-      {place.media.length > 0 && (
-        <div className="media-grid">
-          {place.media.map((m) => (
-            <figure key={m.id}>
-              {m.type === "PHOTO" ? (
-                <img src={`${API_BASE}${m.url}`} alt="" />
-              ) : (
-                <video src={`${API_BASE}${m.url}`} controls />
-              )}
-            </figure>
-          ))}
-        </div>
-      )}
-
-      <div className="actions-row">
-        <button onClick={handleShare} className="secondary">
-          <Share2 size={16} /> Share this place
-        </button>
-      </div>
-
-      {shareLink && (
-        <div className="share-link-box">
-          <Share2 size={15} />
-          <a href={shareLink}>{shareLink}</a>
-        </div>
-      )}
-    </div>
+    </>
   );
 }

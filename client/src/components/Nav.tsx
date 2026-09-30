@@ -30,7 +30,9 @@ export function Nav() {
       <span className="spacer" />
 
       <div className="nav-user">
-        <span className="avatar">{initial}</span>
+        <span className="avatar">
+          <span>{initial}</span>
+        </span>
         <span className="muted">{user.displayName}</span>
         <button
           className="icon-button"
