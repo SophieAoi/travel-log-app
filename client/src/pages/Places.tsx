@@ -56,8 +56,9 @@ export function Places() {
         <p className="muted">Loading…</p>
       ) : places.length === 0 ? (
         <div className="empty-state">
-          <MapPinned size={36} />
-          <p>No places saved yet.</p>
+          <span className="empty-state-emoji">📍</span>
+          <p className="empty-state-title">No places yet</p>
+          <p className="muted">Save a spot above and start building your travel album.</p>
         </div>
       ) : (
         <ul className="place-cards">
