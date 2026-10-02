@@ -474,6 +474,15 @@ a.stat:hover {
   }
 }
 
+@keyframes shell-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .auth-shell {
   position: relative;
   min-height: 100vh;
@@ -481,7 +490,7 @@ a.stat:hover {
   overflow: hidden;
   background: var(--gradient-vivid);
   background-size: 300% 300%;
-  animation: gradient-drift 18s ease-in-out infinite;
+  animation: gradient-drift 18s ease-in-out infinite, shell-fade-in 1.1s var(--ease);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -497,7 +506,8 @@ a.stat:hover {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  animation: fade-up 0.45s var(--ease);
+  opacity: 0;
+  animation: fade-up 0.5s var(--ease) 0.25s forwards;
 }
 
 .auth-page .logo {
