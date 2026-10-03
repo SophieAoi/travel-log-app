@@ -511,8 +511,10 @@ a.stat:hover {
 }
 
 .auth-page .logo {
+  width: 100%;
   justify-content: center;
   margin-bottom: 1.25rem;
+  transform: translateX(-10px);
 }
 
 .auth-page .logo .logo-badge {
