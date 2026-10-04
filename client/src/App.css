@@ -78,6 +78,8 @@ a {
   font-weight: 700;
   font-size: 1.1rem;
   color: var(--color-text);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .logo-badge {
@@ -513,7 +515,7 @@ a.stat:hover {
 .auth-page .logo {
   width: 100%;
   justify-content: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 2.25rem;
   transform: translateX(-10px);
 }
 
@@ -526,17 +528,17 @@ a.stat:hover {
 }
 
 .auth-page .logo .logo-badge {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
 }
 
 .auth-page .logo .logo-badge svg {
-  width: 20px;
-  height: 20px;
+  width: 26px;
+  height: 26px;
 }
 
 .auth-page .logo .logo-word {
-  font-size: 1.15rem;
+  font-size: 1.6rem;
 }
 
 .auth-card {
