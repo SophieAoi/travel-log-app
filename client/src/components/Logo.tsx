@@ -12,7 +12,7 @@ export function Logo({ withWordmark = true }: { withWordmark?: boolean }) {
           />
         </svg>
       </span>
-      {withWordmark && <span className="logo-word">Waypoint</span>}
+      {withWordmark && <span className="logo-word">Globi</span>}
     </span>
   );
 }
