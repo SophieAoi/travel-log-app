@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { MapPinned, Plus, Image as ImageIcon, MapPin, Images } from "lucide-react";
 import { api } from "../api/client";
+import { CountrySelect } from "../components/CountrySelect";
 
 interface Place {
   id: string;
@@ -28,8 +29,8 @@ export function Places() {
 
   async function addPlace(e: FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !countryCode.trim()) return;
-    const created = await api.addPlace({ name: name.trim(), countryCode: countryCode.trim().toUpperCase() });
+    if (!name.trim() || !countryCode) return;
+    const created = await api.addPlace({ name: name.trim(), countryCode });
     setPlaces((prev) => [{ ...created, media: [] }, ...prev]);
     setName("");
     setCountryCode("");
@@ -46,8 +47,8 @@ export function Places() {
 
       <form onSubmit={addPlace} className="inline-form">
         <input placeholder="Place name" value={name} onChange={(e) => setName(e.target.value)} />
-        <input placeholder="Country code" value={countryCode} onChange={(e) => setCountryCode(e.target.value)} maxLength={2} />
-        <button type="submit">
+        <CountrySelect value={countryCode} onChange={setCountryCode} placeholder="Country" />
+        <button type="submit" disabled={!name.trim() || !countryCode}>
           <Plus size={16} /> Add place
         </button>
       </form>
