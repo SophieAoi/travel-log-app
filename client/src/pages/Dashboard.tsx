@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { Plus, X, MapPinned, Camera } from "lucide-react";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { CountrySelect } from "../components/CountrySelect";
+import { countryFlag } from "../data/countries";
 
 interface VisitedCountry {
   id: string;
@@ -14,15 +16,6 @@ interface VisitedCountry {
 interface PlaceSummary {
   id: string;
   media: { id: string }[];
-}
-
-function codeToFlag(code: string) {
-  if (code.length !== 2) return "🌍";
-  const codePoints = code
-    .toUpperCase()
-    .split("")
-    .map((c) => 127397 + c.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
 }
 
 export function Dashboard() {
@@ -42,8 +35,8 @@ export function Dashboard() {
 
   async function addCountry(e: React.FormEvent) {
     e.preventDefault();
-    if (!code.trim()) return;
-    const created = await api.addCountry({ countryCode: code.trim().toUpperCase() });
+    if (!code) return;
+    const created = await api.addCountry({ countryCode: code });
     setCountries((prev) => [created, ...prev.filter((c) => c.id !== created.id)]);
     setCode("");
   }
@@ -89,13 +82,8 @@ export function Dashboard() {
       </div>
 
       <form onSubmit={addCountry} className="inline-form">
-        <input
-          placeholder="Country code (e.g. FR, JP)"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          maxLength={2}
-        />
-        <button type="submit">
+        <CountrySelect value={code} onChange={setCode} placeholder="Add a country you've visited" />
+        <button type="submit" disabled={!code}>
           <Plus size={16} /> Add
         </button>
       </form>
@@ -113,7 +101,7 @@ export function Dashboard() {
           {countries.map((c, i) => (
             <li key={c.id} className="story-bubble" style={{ animationDelay: `${i * 0.03}s` }}>
               <span className="story-ring">
-                <span className="story-flag">{codeToFlag(c.countryCode)}</span>
+                <span className="story-flag">{countryFlag(c.countryCode)}</span>
               </span>
               <span className="story-label">{c.countryCode}</span>
               <button className="story-remove" onClick={() => removeCountry(c.id)} aria-label="Remove">
