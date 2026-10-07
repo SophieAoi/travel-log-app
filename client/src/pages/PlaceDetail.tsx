@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ImagePlus, MapPin, Share2, Camera } from "lucide-react";
+import { ArrowLeft, ImagePlus, MapPin, Share2 } from "lucide-react";
 import { api } from "../api/client";
 
 interface Media {
@@ -49,31 +49,20 @@ export function PlaceDetail() {
 
   if (!place) return <p className="page muted">Loading…</p>;
 
-  const coverPhoto = place.media.find((m) => m.type === "PHOTO");
-
   return (
     <>
-      <div className="detail-hero">
-        {coverPhoto ? (
-          <img src={`${API_BASE}${coverPhoto.url}`} alt="" />
-        ) : (
-          <div className="detail-hero-placeholder">
-            <Camera size={44} />
-          </div>
-        )}
-        <div className="detail-hero-scrim" />
-        <Link to="/places" className="detail-back">
+      <div className="page">
+        <Link to="/places" className="nav-link detail-back-plain">
           <ArrowLeft size={16} /> Places
         </Link>
-        <div className="detail-hero-caption">
-          <span className="badge badge-on-photo">
+
+        <div className="place-title-row">
+          <h1 style={{ margin: 0 }}>{place.name}</h1>
+          <span className="badge">
             <MapPin size={13} /> {place.countryCode}
           </span>
-          <h1>{place.name}</h1>
         </div>
-      </div>
 
-      <div className="page">
         {place.description && <p className="place-description">{place.description}</p>}
 
         <div className="actions-row">
