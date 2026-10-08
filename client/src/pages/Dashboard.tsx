@@ -100,10 +100,14 @@ export function Dashboard() {
         <ul className="country-stories">
           {countries.map((c, i) => (
             <li key={c.id} className="story-bubble" style={{ animationDelay: `${i * 0.03}s` }}>
-              <span className="story-ring">
-                <span className="story-flag">{countryFlag(c.countryCode)}</span>
-              </span>
-              <span className="story-label">{c.countryCode}</span>
+              <Link to={`/countries/${c.countryCode}`} className="story-link">
+                <span className="story-ring">
+                  <span className="story-flag">
+                    <span>{countryFlag(c.countryCode)}</span>
+                  </span>
+                </span>
+                <span className="story-label">{c.countryCode}</span>
+              </Link>
               <button className="story-remove" onClick={() => removeCountry(c.id)} aria-label="Remove">
                 <X size={11} />
               </button>
