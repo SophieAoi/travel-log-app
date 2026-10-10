@@ -4,7 +4,7 @@ import { Plus, X, MapPinned, Camera } from "lucide-react";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { CountrySelect } from "../components/CountrySelect";
-import { countryFlag } from "../data/countries";
+import { FlagImage } from "../components/FlagImage";
 
 interface VisitedCountry {
   id: string;
@@ -103,7 +103,7 @@ export function Dashboard() {
               <Link to={`/countries/${c.countryCode}`} className="story-link">
                 <span className="story-ring">
                   <span className="story-flag">
-                    <span>{countryFlag(c.countryCode)}</span>
+                    <FlagImage code={c.countryCode} />
                   </span>
                 </span>
                 <span className="story-label">{c.countryCode}</span>
