@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
-import { MapPinned, Plus, Image as ImageIcon, MapPin, Images } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { MapPinned, Plus, Image as ImageIcon, MapPin, Images, Pencil, Trash2 } from "lucide-react";
 import { api } from "../api/client";
 import { CountrySelect } from "../components/CountrySelect";
 import { LocationSearch, type LocationValue } from "../components/LocationSearch";
@@ -16,11 +16,13 @@ interface Place {
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:4000";
 
 export function Places() {
+  const navigate = useNavigate();
   const [places, setPlaces] = useState<Place[]>([]);
   const [name, setName] = useState("");
   const [countryCode, setCountryCode] = useState("");
   const [location, setLocation] = useState<LocationValue | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     api.getPlaces().then((data) => {
@@ -42,6 +44,25 @@ export function Places() {
     setName("");
     setCountryCode("");
     setLocation(null);
+  }
+
+  async function handleDelete(e: React.MouseEvent, id: string, placeName: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!window.confirm(`Delete "${placeName}"? This removes its photos too.`)) return;
+    setDeletingId(id);
+    try {
+      await api.deletePlace(id);
+      setPlaces((prev) => prev.filter((p) => p.id !== id));
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
+  function handleEdit(e: React.MouseEvent, id: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(`/places/${id}`);
   }
 
   return (
@@ -81,6 +102,25 @@ export function Places() {
                   <div className="place-thumb">
                     {cover ? <img src={`${API_BASE}${cover.url}`} alt="" /> : <ImageIcon size={30} />}
                     <div className="place-thumb-overlay" />
+                    <div className="place-thumb-hover-actions">
+                      <button
+                        className="place-thumb-action"
+                        onClick={(e) => handleEdit(e, p.id)}
+                        aria-label="Edit place"
+                        type="button"
+                      >
+                        <Pencil size={13} />
+                      </button>
+                      <button
+                        className="place-thumb-action place-thumb-action-danger"
+                        onClick={(e) => handleDelete(e, p.id, p.name)}
+                        aria-label="Delete place"
+                        type="button"
+                        disabled={deletingId === p.id}
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
                     {mediaCount > 0 && (
                       <span className="place-thumb-count">
                         <Images size={12} /> {mediaCount}

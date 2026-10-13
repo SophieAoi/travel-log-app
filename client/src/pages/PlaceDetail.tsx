@@ -1,8 +1,9 @@
 import { useEffect, useState, type ChangeEvent } from "react";
-import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ImagePlus, MapPin, MapPinOff, Share2, Pencil } from "lucide-react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, ImagePlus, MapPin, MapPinOff, Share2, Pencil, Trash2, Check, X } from "lucide-react";
 import { api } from "../api/client";
 import { LocationSearch, type LocationValue } from "../components/LocationSearch";
+import { CountrySelect } from "../components/CountrySelect";
 
 interface Media {
   id: string;
@@ -24,11 +25,17 @@ const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:4000";
 
 export function PlaceDetail() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [place, setPlace] = useState<Place | null>(null);
   const [shareLink, setShareLink] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [editingLocation, setEditingLocation] = useState(false);
   const [savingLocation, setSavingLocation] = useState(false);
+  const [editingDetails, setEditingDetails] = useState(false);
+  const [savingDetails, setSavingDetails] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editCountry, setEditCountry] = useState("");
 
   useEffect(() => {
     if (id) api.getPlace(id).then(setPlace);
@@ -64,6 +71,37 @@ export function PlaceDetail() {
     }
   }
 
+  function startEditingDetails() {
+    if (!place) return;
+    setEditName(place.name);
+    setEditCountry(place.countryCode);
+    setEditingDetails(true);
+  }
+
+  async function saveDetails() {
+    if (!id || !editName.trim() || !editCountry) return;
+    setSavingDetails(true);
+    try {
+      const updated = await api.updatePlace(id, { name: editName.trim(), countryCode: editCountry });
+      setPlace((prev) => (prev ? { ...prev, name: updated.name, countryCode: updated.countryCode } : prev));
+      setEditingDetails(false);
+    } finally {
+      setSavingDetails(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!id || !place) return;
+    if (!window.confirm(`Delete "${place.name}"? This removes its photos too.`)) return;
+    setDeleting(true);
+    try {
+      await api.deletePlace(id);
+      navigate("/places");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   if (!place) return <p className="page muted">Loading…</p>;
 
   const hasPin = place.latitude != null && place.longitude != null;
@@ -75,12 +113,53 @@ export function PlaceDetail() {
           <ArrowLeft size={16} /> Places
         </Link>
 
-        <div className="place-title-row">
-          <h1 style={{ margin: 0 }}>{place.name}</h1>
-          <span className="badge">
-            <MapPin size={13} /> {place.countryCode}
-          </span>
-        </div>
+        {editingDetails ? (
+          <div className="detail-edit-row">
+            <input
+              className="detail-edit-name"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              placeholder="Place name"
+            />
+            <CountrySelect value={editCountry} onChange={setEditCountry} placeholder="Country" />
+            <button
+              className="icon-only-button"
+              onClick={saveDetails}
+              disabled={savingDetails || !editName.trim() || !editCountry}
+              aria-label="Save"
+              type="button"
+            >
+              <Check size={16} />
+            </button>
+            <button
+              className="icon-only-button secondary"
+              onClick={() => setEditingDetails(false)}
+              aria-label="Cancel"
+              type="button"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        ) : (
+          <div className="place-title-row">
+            <h1 style={{ margin: 0 }}>{place.name}</h1>
+            <span className="badge">
+              <MapPin size={13} /> {place.countryCode}
+            </span>
+            <button className="icon-only-button ghost" onClick={startEditingDetails} aria-label="Edit details" type="button">
+              <Pencil size={14} />
+            </button>
+            <button
+              className="icon-only-button ghost danger"
+              onClick={handleDelete}
+              disabled={deleting}
+              aria-label="Delete place"
+              type="button"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        )}
 
         {place.description && <p className="place-description">{place.description}</p>}
 

@@ -1220,6 +1220,44 @@ button.ghost-danger:hover {
   border-radius: 999px;
 }
 
+.place-thumb-hover-actions {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.7rem;
+  display: flex;
+  gap: 0.4rem;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.place-card a:hover .place-thumb-hover-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.place-thumb-action {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(10, 20, 30, 0.55);
+  backdrop-filter: blur(4px);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.place-thumb-action:hover {
+  background: rgba(10, 20, 30, 0.75);
+  box-shadow: none;
+}
+
+.place-thumb-action-danger:hover {
+  background: var(--color-error);
+}
+
 .place-thumb-caption {
   position: absolute;
   left: 0;
@@ -1341,6 +1379,69 @@ button.ghost-danger:hover {
   gap: 0.6rem;
   flex-wrap: wrap;
   margin-bottom: 0.25rem;
+}
+
+.icon-only-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  justify-content: center;
+}
+
+.icon-only-button.ghost {
+  background: none;
+  color: var(--color-muted);
+  border: 1px solid var(--color-border);
+}
+
+.icon-only-button.ghost:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+  box-shadow: none;
+}
+
+.icon-only-button.ghost.danger:hover {
+  color: var(--color-error);
+  border-color: var(--color-error);
+  background: #fbeae7;
+}
+
+.icon-only-button.secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.icon-only-button.secondary:hover {
+  background: var(--color-bg);
+  box-shadow: none;
+}
+
+.detail-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.25rem;
+}
+
+.detail-edit-name {
+  flex: 1;
+  min-width: 180px;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--color-surface);
+}
+
+.detail-edit-name:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
 }
 
 .badge-on-photo {
