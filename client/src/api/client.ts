@@ -46,6 +46,10 @@ export const api = {
     description?: string;
     visitedAt?: string;
   }) => request("/places", { method: "POST", body: JSON.stringify(data) }),
+  updatePlace: (
+    id: string,
+    data: { name?: string; countryCode?: string; latitude?: number; longitude?: number; description?: string }
+  ) => request(`/places/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   deletePlace: (id: string) => request(`/places/${id}`, { method: "DELETE" }),
 
   uploadMedia: (placeId: string, file: File) => {

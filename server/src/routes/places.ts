@@ -37,6 +37,30 @@ placesRouter.post("/", async (req: AuthedRequest, res) => {
   res.status(201).json(place);
 });
 
+placesRouter.patch("/:id", async (req: AuthedRequest, res) => {
+  const place = await prisma.place.findUnique({ where: { id: req.params.id } });
+
+  if (!place || place.userId !== req.userId) {
+    return res.status(404).json({ error: "Not found" });
+  }
+
+  const { name, countryCode, latitude, longitude, description, visitedAt } = req.body ?? {};
+
+  const updated = await prisma.place.update({
+    where: { id: req.params.id },
+    data: {
+      ...(name !== undefined ? { name } : {}),
+      ...(countryCode !== undefined ? { countryCode } : {}),
+      ...(latitude !== undefined ? { latitude } : {}),
+      ...(longitude !== undefined ? { longitude } : {}),
+      ...(description !== undefined ? { description } : {}),
+      ...(visitedAt !== undefined ? { visitedAt: visitedAt ? new Date(visitedAt) : null } : {}),
+    },
+  });
+
+  res.json(updated);
+});
+
 placesRouter.get("/:id", async (req: AuthedRequest, res) => {
   const place = await prisma.place.findUnique({
     where: { id: req.params.id },

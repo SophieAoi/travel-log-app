@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, X, MapPinned, Camera } from "lucide-react";
+import { Plus, X, MapPinned, Camera, Map as MapIcon } from "lucide-react";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { CountrySelect } from "../components/CountrySelect";
 import { FlagImage } from "../components/FlagImage";
+import { WorldMap } from "../components/WorldMap";
 
 interface VisitedCountry {
   id: string;
@@ -15,6 +16,10 @@ interface VisitedCountry {
 
 interface PlaceSummary {
   id: string;
+  name: string;
+  countryCode: string;
+  latitude: number | null;
+  longitude: number | null;
   media: { id: string }[];
 }
 
@@ -48,6 +53,9 @@ export function Dashboard() {
 
   const photoCount = places.reduce((sum, p) => sum + p.media.length, 0);
   const initial = user?.displayName.trim().charAt(0).toUpperCase() ?? "?";
+  const mappedPlaces = places.filter(
+    (p): p is PlaceSummary & { latitude: number; longitude: number } => p.latitude != null && p.longitude != null
+  );
 
   return (
     <div className="page profile-page">
@@ -76,6 +84,18 @@ export function Dashboard() {
           </div>
         </div>
       </div>
+
+      {mappedPlaces.length > 0 && (
+        <>
+          <div className="section-divider">
+            <span>
+              <MapIcon size={13} style={{ verticalAlign: "-2px", marginRight: "0.3rem" }} />
+              Your map
+            </span>
+          </div>
+          <WorldMap places={mappedPlaces} />
+        </>
+      )}
 
       <div className="section-divider">
         <span>Countries visited</span>

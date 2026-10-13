@@ -1,7 +1,8 @@
 import { useEffect, useState, type ChangeEvent } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ImagePlus, MapPin, Share2 } from "lucide-react";
+import { ArrowLeft, ImagePlus, MapPin, MapPinOff, Share2, Pencil } from "lucide-react";
 import { api } from "../api/client";
+import { LocationSearch, type LocationValue } from "../components/LocationSearch";
 
 interface Media {
   id: string;
@@ -14,6 +15,8 @@ interface Place {
   name: string;
   countryCode: string;
   description: string | null;
+  latitude: number | null;
+  longitude: number | null;
   media: Media[];
 }
 
@@ -24,6 +27,8 @@ export function PlaceDetail() {
   const [place, setPlace] = useState<Place | null>(null);
   const [shareLink, setShareLink] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [editingLocation, setEditingLocation] = useState(false);
+  const [savingLocation, setSavingLocation] = useState(false);
 
   useEffect(() => {
     if (id) api.getPlace(id).then(setPlace);
@@ -47,7 +52,21 @@ export function PlaceDetail() {
     setShareLink(`${window.location.origin}/shared/${share.id}`);
   }
 
+  async function handlePickLocation(location: LocationValue | null) {
+    if (!id || !location) return;
+    setSavingLocation(true);
+    try {
+      const updated = await api.updatePlace(id, { latitude: location.lat, longitude: location.lon });
+      setPlace((prev) => (prev ? { ...prev, latitude: updated.latitude, longitude: updated.longitude } : prev));
+      setEditingLocation(false);
+    } finally {
+      setSavingLocation(false);
+    }
+  }
+
   if (!place) return <p className="page muted">Loading…</p>;
+
+  const hasPin = place.latitude != null && place.longitude != null;
 
   return (
     <>
@@ -64,6 +83,27 @@ export function PlaceDetail() {
         </div>
 
         {place.description && <p className="place-description">{place.description}</p>}
+
+        {editingLocation ? (
+          <div className="location-edit-row">
+            <LocationSearch
+              value={null}
+              onChange={handlePickLocation}
+              placeholder={savingLocation ? "Saving…" : "Search for a location..."}
+            />
+            <button className="secondary" onClick={() => setEditingLocation(false)} type="button">
+              Cancel
+            </button>
+          </div>
+        ) : hasPin ? (
+          <button className="pin-status pin-status-set" onClick={() => setEditingLocation(true)} type="button">
+            <MapPin size={14} /> Pinned on the map <Pencil size={12} />
+          </button>
+        ) : (
+          <button className="pin-status pin-status-unset" onClick={() => setEditingLocation(true)} type="button">
+            <MapPinOff size={14} /> Not pinned yet — add a location
+          </button>
+        )}
 
         <div className="actions-row">
           <label className="upload-button">

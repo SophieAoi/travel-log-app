@@ -311,6 +311,138 @@ a.stat:hover {
   background: var(--color-border);
 }
 
+/* World map */
+
+.world-map {
+  height: 320px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  margin-bottom: 1.75rem;
+}
+
+.world-map .leaflet-container {
+  background: #eef3f5;
+  font-family: inherit;
+}
+
+.world-map .leaflet-tooltip {
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+}
+
+/* Location search */
+
+.location-search {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+
+.location-search-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-muted);
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.location-search-input-wrap:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.location-search .location-search-input-wrap input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: none;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  color: var(--color-text);
+}
+
+.location-search .location-search-input-wrap input:focus {
+  border: none;
+  box-shadow: none;
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.location-search-panel {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  width: max(100%, 300px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 20;
+  overflow: hidden;
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem;
+  max-height: 260px;
+  overflow-y: auto;
+  animation: fade-up 0.15s var(--ease);
+}
+
+.location-search-option {
+  width: 100%;
+  background: none;
+  color: var(--color-text);
+  font-weight: 500;
+  font-size: 0.82rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--radius-sm);
+  justify-content: flex-start;
+  text-align: left;
+  align-items: flex-start;
+  line-height: 1.3;
+}
+
+.location-search-option svg {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  color: var(--color-muted);
+}
+
+.location-search-option:hover {
+  background: var(--color-bg);
+  box-shadow: none;
+}
+
+.inline-form-wrap {
+  align-items: flex-start;
+}
+
 .text-link {
   display: inline-flex;
   align-items: center;
@@ -1221,6 +1353,49 @@ button.ghost-danger:hover {
   font-size: 1rem;
   line-height: 1.5;
   margin: 1.5rem 0 0;
+}
+
+.pin-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  background: none;
+}
+
+.pin-status-set {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-dark);
+}
+
+.pin-status-set:hover {
+  background: var(--color-accent-soft);
+  box-shadow: none;
+  opacity: 0.85;
+}
+
+.pin-status-unset {
+  background: var(--color-bg);
+  color: var(--color-muted);
+  border: 1px dashed var(--color-border);
+}
+
+.pin-status-unset:hover {
+  background: var(--color-bg);
+  box-shadow: none;
+  border-color: var(--color-accent);
+  color: var(--color-accent-dark);
+}
+
+.location-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
 }
 
 .upload-button {
