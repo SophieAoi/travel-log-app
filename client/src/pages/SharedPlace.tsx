@@ -3,11 +3,13 @@ import { useParams } from "react-router-dom";
 import { MapPin, Camera, UserRound } from "lucide-react";
 import { api } from "../api/client";
 import { Logo } from "../components/Logo";
+import { PhotoLightbox } from "../components/PhotoLightbox";
 
 interface Media {
   id: string;
   url: string;
   type: "PHOTO" | "VIDEO";
+  caption?: string | null;
 }
 
 interface SharedData {
@@ -21,6 +23,7 @@ export function SharedPlace() {
   const { id } = useParams<{ id: string }>();
   const [data, setData] = useState<SharedData | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (id) api.getShare(id).then(setData).catch(() => setNotFound(true));
@@ -62,18 +65,28 @@ export function SharedPlace() {
 
         {data.place.media.length > 0 && (
           <div className="media-grid">
-            {data.place.media.map((m) => (
-              <figure key={m.id}>
+            {data.place.media.map((m, i) => (
+              <figure key={m.id} className="media-grid-item" onClick={() => setLightboxIndex(i)}>
                 {m.type === "PHOTO" ? (
                   <img src={`${API_BASE}${m.url}`} alt="" />
                 ) : (
-                  <video src={`${API_BASE}${m.url}`} controls />
+                  <video src={`${API_BASE}${m.url}`} />
                 )}
               </figure>
             ))}
           </div>
         )}
       </div>
+
+      {lightboxIndex !== null && (
+        <PhotoLightbox
+          items={data.place.media}
+          index={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onIndexChange={setLightboxIndex}
+          readOnly
+        />
+      )}
     </>
   );
 }

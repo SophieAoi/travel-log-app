@@ -4,11 +4,13 @@ import { ArrowLeft, ImagePlus, MapPin, MapPinOff, Share2, Pencil, Trash2, Check,
 import { api } from "../api/client";
 import { LocationSearch, type LocationValue } from "../components/LocationSearch";
 import { CountrySelect } from "../components/CountrySelect";
+import { PhotoLightbox } from "../components/PhotoLightbox";
 
 interface Media {
   id: string;
   url: string;
   type: "PHOTO" | "VIDEO";
+  caption?: string | null;
 }
 
 interface Place {
@@ -36,6 +38,7 @@ export function PlaceDetail() {
   const [deleting, setDeleting] = useState(false);
   const [editName, setEditName] = useState("");
   const [editCountry, setEditCountry] = useState("");
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (id) api.getPlace(id).then(setPlace);
@@ -202,19 +205,97 @@ export function PlaceDetail() {
         )}
 
         {place.media.length > 0 && (
-          <div className="media-grid">
-            {place.media.map((m) => (
-              <figure key={m.id}>
-                {m.type === "PHOTO" ? (
-                  <img src={`${API_BASE}${m.url}`} alt="" />
-                ) : (
-                  <video src={`${API_BASE}${m.url}`} controls />
-                )}
-              </figure>
+          <div className="media-rows">
+            {place.media.map((m, i) => (
+              <MediaRow
+                key={m.id}
+                media={m}
+                onOpen={() => setLightboxIndex(i)}
+                onCaptionSaved={(caption) =>
+                  setPlace((prev) =>
+                    prev
+                      ? { ...prev, media: prev.media.map((item) => (item.id === m.id ? { ...item, caption } : item)) }
+                      : prev
+                  )
+                }
+              />
             ))}
           </div>
         )}
       </div>
+
+      {lightboxIndex !== null && (
+        <PhotoLightbox
+          items={place.media}
+          index={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onIndexChange={setLightboxIndex}
+          onCaptionSaved={(mediaId, caption) => {
+            setPlace((prev) =>
+              prev
+                ? { ...prev, media: prev.media.map((m) => (m.id === mediaId ? { ...m, caption } : m)) }
+                : prev
+            );
+          }}
+        />
+      )}
     </>
+  );
+}
+
+const CAPTION_MAX = 280;
+
+function MediaRow({
+  media,
+  onOpen,
+  onCaptionSaved,
+}: {
+  media: Media;
+  onOpen: () => void;
+  onCaptionSaved: (caption: string) => void;
+}) {
+  const [draft, setDraft] = useState(media.caption ?? "");
+  const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
+
+  async function save() {
+    if (!dirty) return;
+    setSaving(true);
+    try {
+      await api.updateMedia(media.id, { caption: draft.trim() });
+      onCaptionSaved(draft.trim());
+      setDirty(false);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="media-row">
+      <figure className="media-row-thumb media-grid-item" onClick={onOpen}>
+        {media.type === "PHOTO" ? (
+          <img src={`${API_BASE}${media.url}`} alt="" />
+        ) : (
+          <video src={`${API_BASE}${media.url}`} />
+        )}
+      </figure>
+      <div className="media-row-caption">
+        <textarea
+          value={draft}
+          onChange={(e) => {
+            setDraft(e.target.value.slice(0, CAPTION_MAX));
+            setDirty(true);
+          }}
+          onBlur={save}
+          placeholder="Add a caption..."
+        />
+        <div className="media-row-caption-footer">
+          <span className="bio-char-count">
+            {draft.length}/{CAPTION_MAX}
+          </span>
+          {saving && <span className="muted">Saving…</span>}
+        </div>
+      </div>
+    </div>
   );
 }

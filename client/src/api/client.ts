@@ -59,6 +59,8 @@ export const api = {
     form.append("file", file);
     return request(`/media/${placeId}`, { method: "POST", body: form });
   },
+  updateMedia: (id: string, data: { caption?: string }) =>
+    request(`/media/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   deleteMedia: (id: string) => request(`/media/${id}`, { method: "DELETE" }),
 
   sharePlace: (data: { placeId: string; recipientEmail?: string }) =>

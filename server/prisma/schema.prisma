@@ -54,6 +54,7 @@ model Media {
   id        String   @id @default(uuid())
   url       String
   type      MediaType
+  caption   String?
   createdAt DateTime @default(now())
 
   place   Place  @relation(fields: [placeId], references: [id], onDelete: Cascade)
