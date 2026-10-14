@@ -30,6 +30,8 @@ export const api = {
     request("/auth/signup", { method: "POST", body: JSON.stringify(data) }),
   login: (data: { email: string; password: string }) =>
     request("/auth/login", { method: "POST", body: JSON.stringify(data) }),
+  updateProfile: (data: { bio?: string; displayName?: string }) =>
+    request("/auth/me", { method: "PATCH", body: JSON.stringify(data) }),
 
   getCountries: () => request("/countries"),
   addCountry: (data: { countryCode: string; visitedAt?: string; notes?: string }) =>

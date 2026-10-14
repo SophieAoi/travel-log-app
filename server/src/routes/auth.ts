@@ -2,6 +2,7 @@ import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { prisma } from "../prisma.js";
+import { requireAuth, type AuthedRequest } from "../middleware/auth.js";
 
 export const authRouter = Router();
 
@@ -23,7 +24,9 @@ authRouter.post("/signup", async (req, res) => {
   });
 
   const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET as string, { expiresIn: "7d" });
-  res.status(201).json({ token, user: { id: user.id, email: user.email, displayName: user.displayName } });
+  res
+    .status(201)
+    .json({ token, user: { id: user.id, email: user.email, displayName: user.displayName, bio: user.bio } });
 });
 
 authRouter.post("/login", async (req, res) => {
@@ -39,5 +42,26 @@ authRouter.post("/login", async (req, res) => {
   }
 
   const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET as string, { expiresIn: "7d" });
-  res.json({ token, user: { id: user.id, email: user.email, displayName: user.displayName } });
+  res.json({ token, user: { id: user.id, email: user.email, displayName: user.displayName, bio: user.bio } });
+});
+
+authRouter.patch("/me", requireAuth, async (req: AuthedRequest, res) => {
+  const { bio, displayName } = req.body ?? {};
+
+  if (bio !== undefined && typeof bio !== "string") {
+    return res.status(400).json({ error: "bio must be a string" });
+  }
+  if (bio !== undefined && bio.length > 160) {
+    return res.status(400).json({ error: "bio must be 160 characters or fewer" });
+  }
+
+  const user = await prisma.user.update({
+    where: { id: req.userId },
+    data: {
+      ...(bio !== undefined ? { bio } : {}),
+      ...(displayName !== undefined ? { displayName } : {}),
+    },
+  });
+
+  res.json({ id: user.id, email: user.email, displayName: user.displayName, bio: user.bio });
 });

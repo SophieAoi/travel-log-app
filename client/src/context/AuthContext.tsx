@@ -5,6 +5,7 @@ interface User {
   id: string;
   email: string;
   displayName: string;
+  bio: string | null;
 }
 
 interface AuthContextValue {
@@ -12,6 +13,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, displayName: string) => Promise<void>;
   logout: () => void;
+  updateProfile: (data: { bio?: string; displayName?: string }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -44,8 +46,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
+  async function updateProfile(data: { bio?: string; displayName?: string }) {
+    const updated = await api.updateProfile(data);
+    localStorage.setItem("user", JSON.stringify(updated));
+    setUser(updated);
+  }
+
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, login, signup, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

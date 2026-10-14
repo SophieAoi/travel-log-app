@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, X, MapPinned, Camera, Map as MapIcon } from "lucide-react";
+import { Plus, X, MapPinned, Camera, Map as MapIcon, Pencil, Check } from "lucide-react";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { CountrySelect } from "../components/CountrySelect";
 import { FlagImage } from "../components/FlagImage";
 import { WorldMap } from "../components/WorldMap";
+
+const BIO_MAX = 160;
 
 interface VisitedCountry {
   id: string;
@@ -24,11 +26,14 @@ interface PlaceSummary {
 }
 
 export function Dashboard() {
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const [countries, setCountries] = useState<VisitedCountry[]>([]);
   const [places, setPlaces] = useState<PlaceSummary[]>([]);
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(true);
+  const [editingBio, setEditingBio] = useState(false);
+  const [bioDraft, setBioDraft] = useState("");
+  const [savingBio, setSavingBio] = useState(false);
 
   useEffect(() => {
     Promise.all([api.getCountries(), api.getPlaces()]).then(([countriesData, placesData]) => {
@@ -51,6 +56,21 @@ export function Dashboard() {
     setCountries((prev) => prev.filter((c) => c.id !== id));
   }
 
+  function startEditingBio() {
+    setBioDraft(user?.bio ?? "");
+    setEditingBio(true);
+  }
+
+  async function saveBio() {
+    setSavingBio(true);
+    try {
+      await updateProfile({ bio: bioDraft.trim() });
+      setEditingBio(false);
+    } finally {
+      setSavingBio(false);
+    }
+  }
+
   const photoCount = places.reduce((sum, p) => sum + p.media.length, 0);
   const initial = user?.displayName.trim().charAt(0).toUpperCase() ?? "?";
   const mappedPlaces = places.filter(
@@ -66,7 +86,46 @@ export function Dashboard() {
 
         <div className="profile-info">
           <h1>{user?.displayName}</h1>
-          <p className="profile-bio">Collecting stamps, one trip at a time ✈️</p>
+
+          {editingBio ? (
+            <div className="bio-edit-row">
+              <textarea
+                className="bio-edit-input"
+                value={bioDraft}
+                onChange={(e) => setBioDraft(e.target.value.slice(0, BIO_MAX))}
+                placeholder="Tell people a bit about your travels..."
+                rows={2}
+                autoFocus
+              />
+              <div className="bio-edit-actions">
+                <span className="bio-char-count">
+                  {bioDraft.length}/{BIO_MAX}
+                </span>
+                <button
+                  className="icon-only-button secondary"
+                  onClick={() => setEditingBio(false)}
+                  type="button"
+                  aria-label="Cancel"
+                >
+                  <X size={14} />
+                </button>
+                <button
+                  className="icon-only-button"
+                  onClick={saveBio}
+                  disabled={savingBio}
+                  type="button"
+                  aria-label="Save bio"
+                >
+                  <Check size={14} />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button className="profile-bio-button" onClick={startEditingBio} type="button">
+              <span className="profile-bio">{user?.bio || "Add a short bio..."}</span>
+              <Pencil size={12} className="profile-bio-edit-icon" />
+            </button>
+          )}
 
           <div className="stats-row">
             <div className="stat">
