@@ -629,6 +629,7 @@ a.stat:hover {
 .collage {
   column-count: 2;
   column-gap: 0.9rem;
+  margin-top: 1.5rem;
 }
 
 @media (min-width: 640px) {
@@ -659,6 +660,17 @@ a.stat:hover {
 .collage-card:hover {
   box-shadow: var(--shadow-lg);
   transform: translateY(-3px);
+}
+
+.collage-card-button {
+  width: 100%;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.collage-card-button:hover {
+  background: none;
 }
 
 .collage-card img,
@@ -1624,103 +1636,13 @@ button.ghost-danger:hover {
   cursor: pointer;
 }
 
-/* Media rows (photo + persistent caption box) */
-
-.media-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin: 1.75rem 0 1.5rem;
-}
-
-.media-row {
-  display: flex;
-  gap: 1rem;
-  align-items: stretch;
-  animation: fade-in 0.3s var(--ease) both;
-}
-
-.media-row-thumb {
-  flex-shrink: 0;
-  width: 200px;
-  height: 200px;
-  margin: 0;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.25s var(--ease), transform 0.25s var(--ease);
-}
-
-.media-row-thumb:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
-
-.media-row-thumb img,
-.media-row-thumb video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.media-row-caption {
-  flex: 1;
-  min-width: 220px;
-  display: flex;
-  flex-direction: column;
-}
-
-.media-row-caption textarea {
-  flex: 1;
-  width: 100%;
-  min-height: 200px;
-  padding: 0.8rem 0.9rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  font-family: inherit;
-  font-size: 0.92rem;
-  line-height: 1.5;
-  color: var(--color-text);
-  resize: none;
-}
-
-.media-row-caption textarea:focus {
-  outline: none;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px var(--color-accent-soft);
-}
-
-.media-row-caption-footer {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-top: 0.35rem;
-}
-
-@media (max-width: 560px) {
-  .media-row {
-    flex-direction: column;
-  }
-
-  .media-row-thumb {
-    width: 100%;
-    height: 220px;
-  }
-
-  .media-row-caption textarea {
-    min-height: 100px;
-  }
-}
-
 /* Photo lightbox */
 
 .lightbox-overlay {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(10, 14, 20, 0.92);
+  background: rgba(250, 247, 242, 0.97);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1736,13 +1658,14 @@ button.ghost-danger:hover {
   height: 40px;
   padding: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  color: white;
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-md);
 }
 
 .lightbox-close:hover {
-  background: rgba(255, 255, 255, 0.22);
-  box-shadow: none;
+  background: var(--color-bg);
+  box-shadow: var(--shadow-md);
 }
 
 .lightbox-nav {
@@ -1753,14 +1676,15 @@ button.ghost-danger:hover {
   height: 44px;
   padding: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  color: white;
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-md);
   z-index: 1;
 }
 
 .lightbox-nav:hover {
-  background: rgba(255, 255, 255, 0.22);
-  box-shadow: none;
+  background: var(--color-bg);
+  box-shadow: var(--shadow-md);
 }
 
 .lightbox-nav-prev {
@@ -1777,21 +1701,26 @@ button.ghost-danger:hover {
   align-items: center;
   max-width: min(90vw, 900px);
   max-height: 90vh;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  box-shadow: var(--shadow-lg);
 }
 
 .lightbox-media {
   display: flex;
   align-items: center;
   justify-content: center;
-  max-height: 75vh;
+  max-height: 72vh;
   border-radius: var(--radius-md);
   overflow: hidden;
+  background: var(--color-bg);
 }
 
 .lightbox-media img,
 .lightbox-media video {
   max-width: 100%;
-  max-height: 75vh;
+  max-height: 72vh;
   display: block;
   object-fit: contain;
 }
@@ -1806,8 +1735,8 @@ button.ghost-danger:hover {
   align-items: center;
   gap: 0.5rem;
   width: 100%;
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.75);
+  background: var(--color-bg);
+  color: var(--color-muted);
   font-weight: 400;
   font-size: 0.88rem;
   padding: 0.6rem 0.9rem;
@@ -1817,9 +1746,9 @@ button.ghost-danger:hover {
 }
 
 .lightbox-caption-button:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--color-accent-soft);
   box-shadow: none;
-  color: white;
+  color: var(--color-text);
 }
 
 .lightbox-caption-button span {
@@ -1829,10 +1758,10 @@ button.ghost-danger:hover {
 .lightbox-caption-edit textarea {
   width: 100%;
   padding: 0.6rem 0.8rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
+  background: var(--color-bg);
+  color: var(--color-text);
   font-family: inherit;
   font-size: 0.88rem;
   resize: none;
@@ -1841,10 +1770,7 @@ button.ghost-danger:hover {
 .lightbox-caption-edit textarea:focus {
   outline: none;
   border-color: var(--color-accent);
-}
-
-.lightbox-caption-edit textarea::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
 }
 
 .lightbox-caption-actions {
@@ -1854,12 +1780,8 @@ button.ghost-danger:hover {
   margin-top: 0.5rem;
 }
 
-.lightbox-caption-actions .bio-char-count {
-  color: rgba(255, 255, 255, 0.5);
-}
-
 .lightbox-caption-readonly {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--color-muted);
   font-size: 0.9rem;
   margin: 0.85rem 0 0;
   text-align: center;

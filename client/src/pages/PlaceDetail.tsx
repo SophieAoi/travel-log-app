@@ -205,20 +205,21 @@ export function PlaceDetail() {
         )}
 
         {place.media.length > 0 && (
-          <div className="media-rows">
+          <div className="collage">
             {place.media.map((m, i) => (
-              <MediaRow
+              <button
                 key={m.id}
-                media={m}
-                onOpen={() => setLightboxIndex(i)}
-                onCaptionSaved={(caption) =>
-                  setPlace((prev) =>
-                    prev
-                      ? { ...prev, media: prev.media.map((item) => (item.id === m.id ? { ...item, caption } : item)) }
-                      : prev
-                  )
-                }
-              />
+                className="collage-card collage-card-button"
+                onClick={() => setLightboxIndex(i)}
+                type="button"
+              >
+                {m.type === "PHOTO" ? (
+                  <img src={`${API_BASE}${m.url}`} alt="" loading="lazy" />
+                ) : (
+                  <video src={`${API_BASE}${m.url}`} muted />
+                )}
+                {m.caption && <span className="collage-tag">{m.caption}</span>}
+              </button>
             ))}
           </div>
         )}
@@ -240,62 +241,5 @@ export function PlaceDetail() {
         />
       )}
     </>
-  );
-}
-
-const CAPTION_MAX = 280;
-
-function MediaRow({
-  media,
-  onOpen,
-  onCaptionSaved,
-}: {
-  media: Media;
-  onOpen: () => void;
-  onCaptionSaved: (caption: string) => void;
-}) {
-  const [draft, setDraft] = useState(media.caption ?? "");
-  const [saving, setSaving] = useState(false);
-  const [dirty, setDirty] = useState(false);
-
-  async function save() {
-    if (!dirty) return;
-    setSaving(true);
-    try {
-      await api.updateMedia(media.id, { caption: draft.trim() });
-      onCaptionSaved(draft.trim());
-      setDirty(false);
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  return (
-    <div className="media-row">
-      <figure className="media-row-thumb media-grid-item" onClick={onOpen}>
-        {media.type === "PHOTO" ? (
-          <img src={`${API_BASE}${media.url}`} alt="" />
-        ) : (
-          <video src={`${API_BASE}${media.url}`} />
-        )}
-      </figure>
-      <div className="media-row-caption">
-        <textarea
-          value={draft}
-          onChange={(e) => {
-            setDraft(e.target.value.slice(0, CAPTION_MAX));
-            setDirty(true);
-          }}
-          onBlur={save}
-          placeholder="Add a caption..."
-        />
-        <div className="media-row-caption-footer">
-          <span className="bio-char-count">
-            {draft.length}/{CAPTION_MAX}
-          </span>
-          {saving && <span className="muted">Saving…</span>}
-        </div>
-      </div>
-    </div>
   );
 }

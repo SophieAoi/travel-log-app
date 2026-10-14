@@ -64,15 +64,20 @@ export function SharedPlace() {
         {data.place.description && <p className="place-description">{data.place.description}</p>}
 
         {data.place.media.length > 0 && (
-          <div className="media-grid">
+          <div className="collage">
             {data.place.media.map((m, i) => (
-              <figure key={m.id} className="media-grid-item" onClick={() => setLightboxIndex(i)}>
+              <button
+                key={m.id}
+                className="collage-card collage-card-button"
+                onClick={() => setLightboxIndex(i)}
+                type="button"
+              >
                 {m.type === "PHOTO" ? (
-                  <img src={`${API_BASE}${m.url}`} alt="" />
+                  <img src={`${API_BASE}${m.url}`} alt="" loading="lazy" />
                 ) : (
-                  <video src={`${API_BASE}${m.url}`} />
+                  <video src={`${API_BASE}${m.url}`} muted />
                 )}
-              </figure>
+              </button>
             ))}
           </div>
         )}
