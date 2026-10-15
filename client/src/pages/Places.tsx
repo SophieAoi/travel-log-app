@@ -1,9 +1,10 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { MapPinned, Plus, Image as ImageIcon, MapPin, Images, Pencil, Trash2 } from "lucide-react";
+import { MapPinned, Plus, Image as ImageIcon, MapPin, Images, Pencil } from "lucide-react";
 import { api } from "../api/client";
 import { CountrySelect } from "../components/CountrySelect";
 import { LocationSearch, type LocationValue } from "../components/LocationSearch";
+import { ConfirmDeleteButton } from "../components/ConfirmDeleteButton";
 
 interface Place {
   id: string;
@@ -22,34 +23,39 @@ export function Places() {
   const [countryCode, setCountryCode] = useState("");
   const [location, setLocation] = useState<LocationValue | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [addError, setAddError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
-    api.getPlaces().then((data) => {
-      setPlaces(data);
-      setLoading(false);
-    });
+    api
+      .getPlaces()
+      .then((data) => setPlaces(data))
+      .catch((err) => setLoadError(err instanceof Error ? err.message : "Failed to load your places"))
+      .finally(() => setLoading(false));
   }, []);
 
   async function addPlace(e: FormEvent) {
     e.preventDefault();
     if (!name.trim() || !countryCode) return;
-    const created = await api.addPlace({
-      name: name.trim(),
-      countryCode,
-      latitude: location?.lat,
-      longitude: location?.lon,
-    });
-    setPlaces((prev) => [{ ...created, media: [] }, ...prev]);
-    setName("");
-    setCountryCode("");
-    setLocation(null);
+    setAddError(null);
+    try {
+      const created = await api.addPlace({
+        name: name.trim(),
+        countryCode,
+        latitude: location?.lat,
+        longitude: location?.lon,
+      });
+      setPlaces((prev) => [{ ...created, media: [] }, ...prev]);
+      setName("");
+      setCountryCode("");
+      setLocation(null);
+    } catch (err) {
+      setAddError(err instanceof Error ? err.message : "Failed to add place");
+    }
   }
 
-  async function handleDelete(e: React.MouseEvent, id: string, placeName: string) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!window.confirm(`Delete "${placeName}"? This removes its photos too.`)) return;
+  async function handleDelete(id: string) {
     setDeletingId(id);
     try {
       await api.deletePlace(id);
@@ -83,8 +89,15 @@ export function Places() {
         </button>
       </form>
 
+      {addError && <p className="error">{addError}</p>}
+
       {loading ? (
         <p className="muted">Loading…</p>
+      ) : loadError ? (
+        <div className="empty-state">
+          <p className="empty-state-title">Couldn't load your places</p>
+          <p className="muted">{loadError}</p>
+        </div>
       ) : places.length === 0 ? (
         <div className="empty-state">
           <span className="empty-state-emoji">📍</span>
@@ -111,15 +124,13 @@ export function Places() {
                       >
                         <Pencil size={13} />
                       </button>
-                      <button
-                        className="place-thumb-action place-thumb-action-danger"
-                        onClick={(e) => handleDelete(e, p.id, p.name)}
-                        aria-label="Delete place"
-                        type="button"
+                      <ConfirmDeleteButton
+                        onConfirm={() => handleDelete(p.id)}
                         disabled={deletingId === p.id}
-                      >
-                        <Trash2 size={13} />
-                      </button>
+                        label="Delete place"
+                        className="place-thumb-action place-thumb-action-danger"
+                        armedTimeoutMs={3000}
+                      />
                     </div>
                     {mediaCount > 0 && (
                       <span className="place-thumb-count">

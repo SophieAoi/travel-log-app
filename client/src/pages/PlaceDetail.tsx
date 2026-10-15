@@ -1,10 +1,11 @@
 import { useEffect, useState, type ChangeEvent } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ImagePlus, MapPin, MapPinOff, Share2, Pencil, Trash2, Check, X } from "lucide-react";
+import { ArrowLeft, ImagePlus, MapPin, MapPinOff, Share2, Pencil, Check, X } from "lucide-react";
 import { api } from "../api/client";
 import { LocationSearch, type LocationValue } from "../components/LocationSearch";
 import { CountrySelect } from "../components/CountrySelect";
 import { PhotoLightbox } from "../components/PhotoLightbox";
+import { ConfirmDeleteButton } from "../components/ConfirmDeleteButton";
 
 interface Media {
   id: string;
@@ -94,8 +95,7 @@ export function PlaceDetail() {
   }
 
   async function handleDelete() {
-    if (!id || !place) return;
-    if (!window.confirm(`Delete "${place.name}"? This removes its photos too.`)) return;
+    if (!id) return;
     setDeleting(true);
     try {
       await api.deletePlace(id);
@@ -152,15 +152,7 @@ export function PlaceDetail() {
             <button className="icon-only-button ghost" onClick={startEditingDetails} aria-label="Edit details" type="button">
               <Pencil size={14} />
             </button>
-            <button
-              className="icon-only-button ghost danger"
-              onClick={handleDelete}
-              disabled={deleting}
-              aria-label="Delete place"
-              type="button"
-            >
-              <Trash2 size={14} />
-            </button>
+            <ConfirmDeleteButton onConfirm={handleDelete} disabled={deleting} label="Delete place" />
           </div>
         )}
 
