@@ -34,13 +34,18 @@ export function Dashboard() {
   const [editingBio, setEditingBio] = useState(false);
   const [bioDraft, setBioDraft] = useState("");
   const [savingBio, setSavingBio] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([api.getCountries(), api.getPlaces()]).then(([countriesData, placesData]) => {
-      setCountries(countriesData);
-      setPlaces(placesData);
-      setLoading(false);
-    });
+    Promise.all([api.getCountries(), api.getPlaces()])
+      .then(([countriesData, placesData]) => {
+        setCountries(countriesData);
+        setPlaces(placesData);
+      })
+      .catch((err) => {
+        setLoadError(err instanceof Error ? err.message : "Failed to load your data");
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   async function addCountry(e: React.FormEvent) {
@@ -169,6 +174,11 @@ export function Dashboard() {
 
       {loading ? (
         <p className="muted">Loading…</p>
+      ) : loadError ? (
+        <div className="empty-state">
+          <p className="empty-state-title">Couldn't load your countries</p>
+          <p className="muted">{loadError}</p>
+        </div>
       ) : countries.length === 0 ? (
         <div className="empty-state">
           <span className="empty-state-emoji">🌍</span>
