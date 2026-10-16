@@ -45,6 +45,16 @@ authRouter.post("/login", async (req, res) => {
   res.json({ token, user: { id: user.id, email: user.email, displayName: user.displayName, bio: user.bio } });
 });
 
+authRouter.get("/me", requireAuth, async (req: AuthedRequest, res) => {
+  const user = await prisma.user.findUnique({ where: { id: req.userId } });
+
+  if (!user) {
+    return res.status(401).json({ error: "Invalid or expired session" });
+  }
+
+  res.json({ id: user.id, email: user.email, displayName: user.displayName, bio: user.bio });
+});
+
 authRouter.patch("/me", requireAuth, async (req: AuthedRequest, res) => {
   const { bio, displayName } = req.body ?? {};
 
