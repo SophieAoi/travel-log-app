@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { GuestRoute } from "./components/GuestRoute";
 import { Nav } from "./components/Nav";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
@@ -17,8 +18,22 @@ function App() {
       <AuthProvider>
         <Nav />
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/login"
+            element={
+              <GuestRoute>
+                <Login />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <GuestRoute>
+                <Signup />
+              </GuestRoute>
+            }
+          />
           <Route path="/shared/:id" element={<SharedPlace />} />
           <Route
             path="/"

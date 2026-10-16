@@ -4,6 +4,16 @@ function getToken() {
   return localStorage.getItem("token");
 }
 
+type UnauthorizedHandler = () => void;
+let onUnauthorized: UnauthorizedHandler | null = null;
+
+// Called once by AuthProvider so the API layer can trigger a logout/redirect
+// whenever any request comes back 401, instead of every call site having to
+// check for it individually.
+function setUnauthorizedHandler(handler: UnauthorizedHandler | null) {
+  onUnauthorized = handler;
+}
+
 async function request(path: string, options: RequestInit = {}) {
   const token = getToken();
 
@@ -15,6 +25,10 @@ async function request(path: string, options: RequestInit = {}) {
       ...options.headers,
     },
   });
+
+  if (res.status === 401) {
+    onUnauthorized?.();
+  }
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
@@ -30,6 +44,7 @@ export const api = {
     request("/auth/signup", { method: "POST", body: JSON.stringify(data) }),
   login: (data: { email: string; password: string }) =>
     request("/auth/login", { method: "POST", body: JSON.stringify(data) }),
+  getMe: () => request("/auth/me"),
   updateProfile: (data: { bio?: string; displayName?: string }) =>
     request("/auth/me", { method: "PATCH", body: JSON.stringify(data) }),
 
@@ -68,4 +83,4 @@ export const api = {
   getShare: (id: string) => request(`/shares/${id}`),
 };
 
-export { getToken };
+export { getToken, setUnauthorizedHandler };
