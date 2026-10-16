@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import { api } from "../api/client";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { api, setUnauthorizedHandler } from "../api/client";
 
 interface User {
   id: string;
@@ -10,6 +10,7 @@ interface User {
 
 interface AuthContextValue {
   user: User | null;
+  checkingSession: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, displayName: string) => Promise<void>;
   logout: () => void;
@@ -19,16 +20,41 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const stored = localStorage.getItem("user");
-    return stored ? JSON.parse(stored) : null;
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [checkingSession, setCheckingSession] = useState(true);
 
   function persist(token: string, user: User) {
     localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
     setUser(user);
   }
+
+  function clearSession() {
+    localStorage.removeItem("token");
+    setUser(null);
+  }
+
+  // On startup, don't trust a cached user object — the token backing it may
+  // have expired or been issued before a schema change. Ask the server.
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setCheckingSession(false);
+      return;
+    }
+
+    api
+      .getMe()
+      .then((me) => setUser(me))
+      .catch(() => clearSession())
+      .finally(() => setCheckingSession(false));
+  }, []);
+
+  // Any API call that comes back 401 (expired/invalid token) drops the
+  // session immediately, from wherever in the app it happened.
+  useEffect(() => {
+    setUnauthorizedHandler(() => clearSession());
+    return () => setUnauthorizedHandler(null);
+  }, []);
 
   async function login(email: string, password: string) {
     const res = await api.login({ email, password });
@@ -41,19 +67,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
+    clearSession();
   }
 
   async function updateProfile(data: { bio?: string; displayName?: string }) {
     const updated = await api.updateProfile(data);
-    localStorage.setItem("user", JSON.stringify(updated));
     setUser(updated);
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, checkingSession, login, signup, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
