@@ -6,12 +6,19 @@ import { LocationSearch, type LocationValue } from "../components/LocationSearch
 import { CountrySelect } from "../components/CountrySelect";
 import { PhotoLightbox } from "../components/PhotoLightbox";
 import { ConfirmDeleteButton } from "../components/ConfirmDeleteButton";
+import { TagPicker } from "../components/TagPicker";
+import { tagMeta, type TagCategory } from "../data/tags";
 
 interface Media {
   id: string;
   url: string;
   type: "PHOTO" | "VIDEO";
   caption?: string | null;
+}
+
+interface PlaceTag {
+  id: string;
+  category: TagCategory;
 }
 
 interface Place {
@@ -22,6 +29,7 @@ interface Place {
   latitude: number | null;
   longitude: number | null;
   media: Media[];
+  tags: PlaceTag[];
 }
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:4000";
@@ -40,6 +48,9 @@ export function PlaceDetail() {
   const [editName, setEditName] = useState("");
   const [editCountry, setEditCountry] = useState("");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [editingTags, setEditingTags] = useState(false);
+  const [tagDraft, setTagDraft] = useState<TagCategory[]>([]);
+  const [savingTags, setSavingTags] = useState(false);
 
   useEffect(() => {
     if (id) api.getPlace(id).then(setPlace);
@@ -102,6 +113,24 @@ export function PlaceDetail() {
       navigate("/places");
     } finally {
       setDeleting(false);
+    }
+  }
+
+  function startEditingTags() {
+    if (!place) return;
+    setTagDraft(place.tags.map((t) => t.category));
+    setEditingTags(true);
+  }
+
+  async function saveTags() {
+    if (!id) return;
+    setSavingTags(true);
+    try {
+      const updated = await api.updatePlace(id, { tags: tagDraft });
+      setPlace((prev) => (prev ? { ...prev, tags: updated.tags } : prev));
+      setEditingTags(false);
+    } finally {
+      setSavingTags(false);
     }
   }
 
@@ -176,6 +205,44 @@ export function PlaceDetail() {
         ) : (
           <button className="pin-status pin-status-unset" onClick={() => setEditingLocation(true)} type="button">
             <MapPinOff size={14} /> Not pinned yet — add a location
+          </button>
+        )}
+
+        {editingTags ? (
+          <div className="tags-edit-block">
+            <TagPicker value={tagDraft} onChange={setTagDraft} />
+            <div className="tags-edit-actions">
+              <button className="icon-only-button" onClick={saveTags} disabled={savingTags} aria-label="Save tags" type="button">
+                <Check size={16} />
+              </button>
+              <button
+                className="icon-only-button secondary"
+                onClick={() => setEditingTags(false)}
+                aria-label="Cancel"
+                type="button"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button className="tags-summary" onClick={startEditingTags} type="button">
+            {place.tags.length > 0 ? (
+              place.tags.map((t) => {
+                const meta = tagMeta(t.category);
+                const Icon = meta?.icon;
+                return (
+                  <span key={t.id} className="tag-chip tag-chip-active">
+                    {Icon && <Icon size={13} />}
+                    {meta?.label ?? t.category}
+                  </span>
+                );
+              })
+            ) : (
+              <span className="tag-chip">
+                <Pencil size={12} /> Add tags
+              </span>
+            )}
           </button>
         )}
 

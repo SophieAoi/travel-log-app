@@ -1,65 +1,49 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, X, MapPinned, Camera, Map as MapIcon, Pencil, Check } from "lucide-react";
+import { Pencil, Check, X, Images } from "lucide-react";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
-import { CountrySelect } from "../components/CountrySelect";
-import { FlagImage } from "../components/FlagImage";
-import { WorldMap } from "../components/WorldMap";
 
 const BIO_MAX = 160;
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:4000";
 
-interface VisitedCountry {
+interface Media {
   id: string;
-  countryCode: string;
-  visitedAt: string | null;
-  notes: string | null;
+  url: string;
+  type: "PHOTO" | "VIDEO";
 }
 
 interface PlaceSummary {
   id: string;
   name: string;
-  countryCode: string;
-  latitude: number | null;
-  longitude: number | null;
-  media: { id: string }[];
+  media: Media[];
+}
+
+interface GridPhoto {
+  media: Media;
+  placeId: string;
+  placeName: string;
 }
 
 export function Dashboard() {
   const { user, updateProfile } = useAuth();
-  const [countries, setCountries] = useState<VisitedCountry[]>([]);
   const [places, setPlaces] = useState<PlaceSummary[]>([]);
-  const [code, setCode] = useState("");
+  const [countryCount, setCountryCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [editingBio, setEditingBio] = useState(false);
   const [bioDraft, setBioDraft] = useState("");
   const [savingBio, setSavingBio] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([api.getCountries(), api.getPlaces()])
       .then(([countriesData, placesData]) => {
-        setCountries(countriesData);
+        setCountryCount(countriesData.length);
         setPlaces(placesData);
       })
-      .catch((err) => {
-        setLoadError(err instanceof Error ? err.message : "Failed to load your data");
-      })
+      .catch((err) => setLoadError(err instanceof Error ? err.message : "Failed to load your data"))
       .finally(() => setLoading(false));
   }, []);
-
-  async function addCountry(e: React.FormEvent) {
-    e.preventDefault();
-    if (!code) return;
-    const created = await api.addCountry({ countryCode: code });
-    setCountries((prev) => [created, ...prev.filter((c) => c.id !== created.id)]);
-    setCode("");
-  }
-
-  async function removeCountry(id: string) {
-    await api.deleteCountry(id);
-    setCountries((prev) => prev.filter((c) => c.id !== id));
-  }
 
   function startEditingBio() {
     setBioDraft(user?.bio ?? "");
@@ -78,144 +62,97 @@ export function Dashboard() {
 
   const photoCount = places.reduce((sum, p) => sum + p.media.length, 0);
   const initial = user?.displayName.trim().charAt(0).toUpperCase() ?? "?";
-  const mappedPlaces = places.filter(
-    (p): p is PlaceSummary & { latitude: number; longitude: number } => p.latitude != null && p.longitude != null
+
+  const gridPhotos: GridPhoto[] = useMemo(
+    () => places.flatMap((p) => p.media.map((m) => ({ media: m, placeId: p.id, placeName: p.name }))),
+    [places]
   );
 
   return (
-    <div className="page profile-page">
-      <div className="profile-header">
-        <span className="avatar avatar-lg">
+    <div className="page pinterest-profile">
+      <div className="pinterest-profile-header">
+        <span className="avatar avatar-xl">
           <span>{initial}</span>
         </span>
 
-        <div className="profile-info">
-          <h1>{user?.displayName}</h1>
+        <h1>{user?.displayName}</h1>
 
-          {editingBio ? (
-            <div className="bio-edit-row">
-              <textarea
-                className="bio-edit-input"
-                value={bioDraft}
-                onChange={(e) => setBioDraft(e.target.value.slice(0, BIO_MAX))}
-                placeholder="Tell people a bit about your travels..."
-                rows={2}
-                autoFocus
-              />
-              <div className="bio-edit-actions">
-                <span className="bio-char-count">
-                  {bioDraft.length}/{BIO_MAX}
-                </span>
-                <button
-                  className="icon-only-button secondary"
-                  onClick={() => setEditingBio(false)}
-                  type="button"
-                  aria-label="Cancel"
-                >
-                  <X size={14} />
-                </button>
-                <button
-                  className="icon-only-button"
-                  onClick={saveBio}
-                  disabled={savingBio}
-                  type="button"
-                  aria-label="Save bio"
-                >
-                  <Check size={14} />
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button className="profile-bio-button" onClick={startEditingBio} type="button">
-              <span className="profile-bio">{user?.bio || "Add a short bio..."}</span>
-              <Pencil size={12} className="profile-bio-edit-icon" />
-            </button>
-          )}
+        <p className="pinterest-stats-line">
+          <strong>{countryCount}</strong> {countryCount === 1 ? "country" : "countries"}
+          <span className="dot">·</span>
+          <strong>{places.length}</strong> {places.length === 1 ? "place" : "places"}
+          <span className="dot">·</span>
+          <strong>{photoCount}</strong> {photoCount === 1 ? "photo" : "photos"}
+        </p>
 
-          <div className="stats-row">
-            <div className="stat">
-              <strong>{countries.length}</strong>
-              <span>{countries.length === 1 ? "country" : "countries"}</span>
-            </div>
-            <Link to="/places" className="stat">
-              <strong>{places.length}</strong>
-              <span>{places.length === 1 ? "place" : "places"}</span>
-            </Link>
-            <div className="stat">
-              <strong>{photoCount}</strong>
-              <span>{photoCount === 1 ? "photo" : "photos"}</span>
+        {editingBio ? (
+          <div className="bio-edit-row pinterest-bio-edit">
+            <textarea
+              className="bio-edit-input"
+              value={bioDraft}
+              onChange={(e) => setBioDraft(e.target.value.slice(0, BIO_MAX))}
+              placeholder="Tell people a bit about your travels..."
+              rows={2}
+              autoFocus
+            />
+            <div className="bio-edit-actions">
+              <span className="bio-char-count">
+                {bioDraft.length}/{BIO_MAX}
+              </span>
+              <button className="icon-only-button secondary" onClick={() => setEditingBio(false)} type="button" aria-label="Cancel">
+                <X size={14} />
+              </button>
+              <button className="icon-only-button" onClick={saveBio} disabled={savingBio} type="button" aria-label="Save bio">
+                <Check size={14} />
+              </button>
             </div>
           </div>
-        </div>
-      </div>
+        ) : (
+          <p className="pinterest-bio">{user?.bio || "Curating the places worth remembering."}</p>
+        )}
 
-      {mappedPlaces.length > 0 && (
-        <>
-          <div className="section-divider">
-            <span>
-              <MapIcon size={13} style={{ verticalAlign: "-2px", marginRight: "0.3rem" }} />
-              Your map
-            </span>
-          </div>
-          <WorldMap places={mappedPlaces} />
-        </>
-      )}
-
-      <div className="section-divider">
-        <span>Countries visited</span>
-      </div>
-
-      <form onSubmit={addCountry} className="inline-form">
-        <CountrySelect value={code} onChange={setCode} placeholder="Add a country you've visited" />
-        <button type="submit" disabled={!code}>
-          <Plus size={16} /> Add
+        <button className="edit-profile-button" onClick={startEditingBio} type="button">
+          <Pencil size={13} /> Edit profile
         </button>
-      </form>
+      </div>
+
+      <div className="pinterest-tabs">
+        <span className="pinterest-tab active">Places</span>
+      </div>
 
       {loading ? (
         <p className="muted">Loading…</p>
       ) : loadError ? (
         <div className="empty-state">
-          <p className="empty-state-title">Couldn't load your countries</p>
+          <p className="empty-state-title">Couldn't load your places</p>
           <p className="muted">{loadError}</p>
         </div>
-      ) : countries.length === 0 ? (
+      ) : gridPhotos.length === 0 ? (
         <div className="empty-state">
-          <span className="empty-state-emoji">🌍</span>
-          <p className="empty-state-title">Your map is empty</p>
-          <p className="muted">Add the first country you've explored to start your collection.</p>
+          <Images size={32} />
+          <p className="empty-state-title">No photos yet</p>
+          <p className="muted">
+            Add a <Link to="/places">place</Link> and drop in some photos to fill your grid.
+          </p>
         </div>
       ) : (
-        <ul className="country-stories">
-          {countries.map((c, i) => (
-            <li key={c.id} className="story-bubble" style={{ animationDelay: `${i * 0.03}s` }}>
-              <Link to={`/countries/${c.countryCode}`} className="story-link">
-                <span className="story-ring">
-                  <span className="story-flag">
-                    <FlagImage code={c.countryCode} />
-                  </span>
-                </span>
-                <span className="story-label">{c.countryCode}</span>
-              </Link>
-              <button className="story-remove" onClick={() => removeCountry(c.id)} aria-label="Remove">
-                <X size={11} />
-              </button>
-            </li>
+        <div className="collage">
+          {gridPhotos.map((item, i) => (
+            <Link
+              to={`/places/${item.placeId}`}
+              key={item.media.id}
+              className="collage-card"
+              style={{ animationDelay: `${(i % 12) * 0.03}s` }}
+            >
+              {item.media.type === "PHOTO" ? (
+                <img src={`${API_BASE}${item.media.url}`} alt="" loading="lazy" />
+              ) : (
+                <video src={`${API_BASE}${item.media.url}`} muted />
+              )}
+              <span className="collage-tag">{item.placeName}</span>
+            </Link>
           ))}
-        </ul>
-      )}
-
-      {!loading && places.length === 0 && (
-        <Link to="/places" className="promo-card">
-          <Camera size={20} />
-          <div>
-            <strong>Start your first photo album</strong>
-            <span>Save a place and drop in your favorite shots.</span>
-          </div>
-          <span className="promo-arrow">
-            <MapPinned size={16} />
-          </span>
-        </Link>
+        </div>
       )}
     </div>
   );

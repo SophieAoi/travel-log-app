@@ -1,10 +1,17 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MapPinned, Plus, Image as ImageIcon, MapPin, Images, Pencil } from "lucide-react";
 import { api } from "../api/client";
 import { CountrySelect } from "../components/CountrySelect";
 import { LocationSearch, type LocationValue } from "../components/LocationSearch";
 import { ConfirmDeleteButton } from "../components/ConfirmDeleteButton";
+import { TagPicker } from "../components/TagPicker";
+import { TAGS, tagMeta, type TagCategory } from "../data/tags";
+
+interface PlaceTag {
+  id: string;
+  category: TagCategory;
+}
 
 interface Place {
   id: string;
@@ -12,6 +19,7 @@ interface Place {
   countryCode: string;
   description: string | null;
   media: { id: string; url: string; type: string }[];
+  tags: PlaceTag[];
 }
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:4000";
@@ -22,10 +30,12 @@ export function Places() {
   const [name, setName] = useState("");
   const [countryCode, setCountryCode] = useState("");
   const [location, setLocation] = useState<LocationValue | null>(null);
+  const [newTags, setNewTags] = useState<TagCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [addError, setAddError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [activeFilters, setActiveFilters] = useState<TagCategory[]>([]);
 
   useEffect(() => {
     api
@@ -45,11 +55,13 @@ export function Places() {
         countryCode,
         latitude: location?.lat,
         longitude: location?.lon,
+        tags: newTags,
       });
       setPlaces((prev) => [{ ...created, media: [] }, ...prev]);
       setName("");
       setCountryCode("");
       setLocation(null);
+      setNewTags([]);
     } catch (err) {
       setAddError(err instanceof Error ? err.message : "Failed to add place");
     }
@@ -71,6 +83,21 @@ export function Places() {
     navigate(`/places/${id}`);
   }
 
+  function toggleFilter(tag: TagCategory) {
+    setActiveFilters((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
+  }
+
+  const usedTags = useMemo(() => {
+    const seen = new Set<TagCategory>();
+    places.forEach((p) => p.tags.forEach((t) => seen.add(t.category)));
+    return TAGS.filter((t) => seen.has(t.value));
+  }, [places]);
+
+  const visiblePlaces = useMemo(() => {
+    if (activeFilters.length === 0) return places;
+    return places.filter((p) => activeFilters.every((f) => p.tags.some((t) => t.category === f)));
+  }, [places, activeFilters]);
+
   return (
     <div className="page">
       <div className="page-header">
@@ -89,7 +116,30 @@ export function Places() {
         </button>
       </form>
 
+      <TagPicker value={newTags} onChange={setNewTags} />
+
       {addError && <p className="error">{addError}</p>}
+
+      {!loading && !loadError && usedTags.length > 0 && (
+        <div className="tag-filter-bar">
+          {usedTags.map((t) => {
+            const Icon = t.icon;
+            const active = activeFilters.includes(t.value);
+            return (
+              <button
+                key={t.value}
+                type="button"
+                className={`tag-chip ${active ? "tag-chip-active" : ""}`}
+                onClick={() => toggleFilter(t.value)}
+                aria-pressed={active}
+              >
+                <Icon size={13} />
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {loading ? (
         <p className="muted">Loading…</p>
@@ -104,9 +154,14 @@ export function Places() {
           <p className="empty-state-title">No places yet</p>
           <p className="muted">Save a spot above and start building your travel album.</p>
         </div>
+      ) : visiblePlaces.length === 0 ? (
+        <div className="empty-state">
+          <p className="empty-state-title">No places match those tags</p>
+          <p className="muted">Try clearing a filter.</p>
+        </div>
       ) : (
         <ul className="place-cards">
-          {places.map((p, i) => {
+          {visiblePlaces.map((p, i) => {
             const cover = p.media.find((m) => m.type === "PHOTO");
             const mediaCount = p.media.length;
             return (
@@ -142,6 +197,15 @@ export function Places() {
                       <span className="place-thumb-loc">
                         <MapPin size={12} /> {p.countryCode}
                       </span>
+                      {p.tags.length > 0 && (
+                        <div className="place-thumb-tags">
+                          {p.tags.map((t) => (
+                            <span key={t.id} className="place-thumb-tag">
+                              {tagMeta(t.category)?.label ?? t.category}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </Link>

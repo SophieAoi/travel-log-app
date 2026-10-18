@@ -48,6 +48,30 @@ model Place {
 
   media  Media[]
   shares Share[]
+  tags   PlaceTag[]
+}
+
+enum TagCategory {
+  RESTAURANT
+  ATTRACTION
+  HOTEL
+  BEACH
+  NIGHTLIFE
+  SHOPPING
+  NATURE
+  MUSEUM
+  CAFE
+  ACTIVITY
+}
+
+model PlaceTag {
+  id       String      @id @default(uuid())
+  category TagCategory
+
+  place   Place  @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  placeId String
+
+  @@unique([placeId, category])
 }
 
 model Media {
