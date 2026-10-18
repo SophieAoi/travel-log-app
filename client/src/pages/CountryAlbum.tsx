@@ -45,7 +45,7 @@ export function CountryAlbum() {
 
   return (
     <div className="page">
-      <Link to="/" className="nav-link detail-back-plain">
+      <Link to="/countries" className="nav-link detail-back-plain">
         <ArrowLeft size={16} /> Countries
       </Link>
 

@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Globe2, MapPinned, LogOut } from "lucide-react";
+import { Home, Globe2, MapPinned, LogOut } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { Logo } from "./Logo";
 
@@ -13,35 +13,50 @@ export function Nav() {
   const initial = user.displayName.trim().charAt(0).toUpperCase();
 
   return (
-    <nav className="nav">
-      <Link to="/" className="logo">
-        <Logo />
+    <nav className="sidebar">
+      <Link to="/" className="sidebar-logo" title="Globi">
+        <Logo withWordmark={false} />
       </Link>
 
-      <div className="nav-links">
-        <Link to="/" className={`nav-link ${location.pathname === "/" ? "active" : ""}`}>
-          <Globe2 size={16} /> Countries
+      <div className="sidebar-links">
+        <Link
+          to="/"
+          className={`sidebar-link ${location.pathname === "/" ? "active" : ""}`}
+          title="Profile"
+        >
+          <Home size={22} />
         </Link>
-        <Link to="/places" className={`nav-link ${location.pathname.startsWith("/places") ? "active" : ""}`}>
-          <MapPinned size={16} /> Places
+        <Link
+          to="/countries"
+          className={`sidebar-link ${location.pathname.startsWith("/countries") ? "active" : ""}`}
+          title="Countries"
+        >
+          <Globe2 size={22} />
+        </Link>
+        <Link
+          to="/places"
+          className={`sidebar-link ${location.pathname.startsWith("/places") ? "active" : ""}`}
+          title="Places"
+        >
+          <MapPinned size={22} />
         </Link>
       </div>
 
-      <span className="spacer" />
-
-      <div className="nav-user">
-        <span className="avatar">
-          <span>{initial}</span>
-        </span>
-        <span className="muted">{user.displayName}</span>
+      <div className="sidebar-bottom">
+        <button className="sidebar-link" onClick={() => navigate("/")} title={user.displayName}>
+          <span className="avatar">
+            <span>{initial}</span>
+          </span>
+        </button>
         <button
-          className="icon-button"
+          className="sidebar-link"
+          title="Log out"
           onClick={() => {
             logout();
             navigate("/login");
           }}
         >
-          <LogOut size={16} /> Log out
+          <LogOut size={20} />
         </button>
       </div>
     </nav>

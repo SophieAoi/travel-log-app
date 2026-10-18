@@ -1,3 +1,5 @@
+import type { TagCategory } from "../data/tags";
+
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:4000";
 
 function getToken() {
@@ -62,10 +64,18 @@ export const api = {
     longitude?: number;
     description?: string;
     visitedAt?: string;
+    tags?: TagCategory[];
   }) => request("/places", { method: "POST", body: JSON.stringify(data) }),
   updatePlace: (
     id: string,
-    data: { name?: string; countryCode?: string; latitude?: number; longitude?: number; description?: string }
+    data: {
+      name?: string;
+      countryCode?: string;
+      latitude?: number;
+      longitude?: number;
+      description?: string;
+      tags?: TagCategory[];
+    }
   ) => request(`/places/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   deletePlace: (id: string) => request(`/places/${id}`, { method: "DELETE" }),
 
