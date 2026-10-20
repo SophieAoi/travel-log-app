@@ -21,5 +21,9 @@ app.use("/places", placesRouter);
 app.use("/media", mediaRouter);
 app.use("/shares", sharesRouter);
 
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  res.status(400).json({ error: err.message || "Something went wrong" });
+});
+
 const port = process.env.PORT ? Number(process.env.PORT) : 4000;
 app.listen(port, () => console.log(`Server listening on port ${port}`));

@@ -6,6 +6,7 @@ interface User {
   email: string;
   displayName: string;
   bio: string | null;
+  avatarUrl: string | null;
 }
 
 interface AuthContextValue {
@@ -15,6 +16,7 @@ interface AuthContextValue {
   signup: (email: string, password: string, displayName: string) => Promise<void>;
   logout: () => void;
   updateProfile: (data: { bio?: string; displayName?: string }) => Promise<void>;
+  uploadAvatar: (file: File) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -75,8 +77,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(updated);
   }
 
+  async function uploadAvatar(file: File) {
+    const updated = await api.uploadAvatar(file);
+    setUser(updated);
+  }
+
   return (
-    <AuthContext.Provider value={{ user, checkingSession, login, signup, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, checkingSession, login, signup, logout, updateProfile, uploadAvatar }}>
       {children}
     </AuthContext.Provider>
   );

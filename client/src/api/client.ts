@@ -49,6 +49,11 @@ export const api = {
   getMe: () => request("/auth/me"),
   updateProfile: (data: { bio?: string; displayName?: string }) =>
     request("/auth/me", { method: "PATCH", body: JSON.stringify(data) }),
+  uploadAvatar: (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    return request("/auth/me/avatar", { method: "POST", body: form });
+  },
 
   getCountries: () => request("/countries"),
   addCountry: (data: { countryCode: string; visitedAt?: string; notes?: string }) =>

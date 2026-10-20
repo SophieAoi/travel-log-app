@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { Link } from "react-router-dom";
-import { Pencil, Check, X, Images } from "lucide-react";
+import { Pencil, Check, X, Images, Camera } from "lucide-react";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 
@@ -26,7 +26,7 @@ interface GridPhoto {
 }
 
 export function Dashboard() {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, uploadAvatar } = useAuth();
   const [places, setPlaces] = useState<PlaceSummary[]>([]);
   const [countryCount, setCountryCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -34,6 +34,8 @@ export function Dashboard() {
   const [editingBio, setEditingBio] = useState(false);
   const [bioDraft, setBioDraft] = useState("");
   const [savingBio, setSavingBio] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([api.getCountries(), api.getPlaces()])
@@ -60,6 +62,21 @@ export function Dashboard() {
     }
   }
 
+  async function handleAvatarChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarError(null);
+    setUploadingAvatar(true);
+    try {
+      await uploadAvatar(file);
+    } catch (err) {
+      setAvatarError(err instanceof Error ? err.message : "Failed to update profile picture");
+    } finally {
+      setUploadingAvatar(false);
+      e.target.value = "";
+    }
+  }
+
   const photoCount = places.reduce((sum, p) => sum + p.media.length, 0);
   const initial = user?.displayName.trim().charAt(0).toUpperCase() ?? "?";
 
@@ -71,9 +88,21 @@ export function Dashboard() {
   return (
     <div className="page pinterest-profile">
       <div className="pinterest-profile-header">
-        <span className="avatar avatar-xl">
-          <span>{initial}</span>
-        </span>
+        <label className="avatar-upload" title="Change profile picture">
+          <span className="avatar avatar-xl">
+            {user?.avatarUrl ? (
+              <img src={`${API_BASE}${user.avatarUrl}`} alt="" />
+            ) : (
+              <span>{initial}</span>
+            )}
+          </span>
+          <span className={`avatar-upload-overlay ${uploadingAvatar ? "avatar-upload-overlay-visible" : ""}`}>
+            {uploadingAvatar ? <span className="avatar-upload-spinner" /> : <Camera size={20} />}
+          </span>
+          <input type="file" accept="image/*" onChange={handleAvatarChange} hidden disabled={uploadingAvatar} />
+        </label>
+
+        {avatarError && <p className="error">{avatarError}</p>}
 
         <h1>{user?.displayName}</h1>
 

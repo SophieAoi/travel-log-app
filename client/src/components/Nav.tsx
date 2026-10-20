@@ -3,6 +3,8 @@ import { Home, Globe2, MapPinned, LogOut } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { Logo } from "./Logo";
 
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:4000";
+
 export function Nav() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -45,7 +47,7 @@ export function Nav() {
       <div className="sidebar-bottom">
         <button className="sidebar-link" onClick={() => navigate("/")} title={user.displayName}>
           <span className="avatar">
-            <span>{initial}</span>
+            {user.avatarUrl ? <img src={`${API_BASE}${user.avatarUrl}`} alt="" /> : <span>{initial}</span>}
           </span>
         </button>
         <button
