@@ -45,6 +45,13 @@ export function Nav() {
       </div>
 
       <div className="sidebar-bottom">
+        <Link
+          to="/settings"
+          className={`sidebar-link ${location.pathname === "/settings" ? "active" : ""}`}
+          title="Settings"
+        >
+          <Settings size={20} />
+        </Link>
         <button className="sidebar-link" onClick={() => navigate("/")} title={user.displayName}>
           <span className="avatar">
             {user.avatarUrl ? <img src={`${API_BASE}${user.avatarUrl}`} alt="" /> : <span>{initial}</span>}
