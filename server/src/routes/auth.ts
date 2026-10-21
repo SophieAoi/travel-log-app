@@ -86,7 +86,7 @@ authRouter.get("/me", requireAuth, async (req: AuthedRequest, res) => {
 });
 
 authRouter.patch("/me", requireAuth, async (req: AuthedRequest, res) => {
-  const { bio, displayName } = req.body ?? {};
+  const { bio, displayName, email } = req.body ?? {};
 
   if (bio !== undefined && typeof bio !== "string") {
     return res.status(400).json({ error: "bio must be a string" });
@@ -94,16 +94,50 @@ authRouter.patch("/me", requireAuth, async (req: AuthedRequest, res) => {
   if (bio !== undefined && bio.length > 160) {
     return res.status(400).json({ error: "bio must be 160 characters or fewer" });
   }
+  if (displayName !== undefined && !displayName.trim()) {
+    return res.status(400).json({ error: "displayName cannot be empty" });
+  }
+  if (email !== undefined) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: "Enter a valid email address" });
+    }
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing && existing.id !== req.userId) {
+      return res.status(409).json({ error: "That email is already in use" });
+    }
+  }
 
   const user = await prisma.user.update({
     where: { id: req.userId },
     data: {
       ...(bio !== undefined ? { bio } : {}),
       ...(displayName !== undefined ? { displayName } : {}),
+      ...(email !== undefined ? { email } : {}),
     },
   });
 
   res.json(toUserJson(user));
+});
+
+authRouter.patch("/me/password", requireAuth, async (req: AuthedRequest, res) => {
+  const { currentPassword, newPassword } = req.body ?? {};
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: "currentPassword and newPassword are required" });
+  }
+  if (newPassword.length < 8) {
+    return res.status(400).json({ error: "newPassword must be at least 8 characters" });
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: req.userId } });
+  if (!user || !(await bcrypt.compare(currentPassword, user.passwordHash))) {
+    return res.status(401).json({ error: "Current password is incorrect" });
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  await prisma.user.update({ where: { id: req.userId }, data: { passwordHash } });
+
+  res.json({ ok: true });
 });
 
 authRouter.post("/me/avatar", requireAuth, uploadAvatar.single("file"), async (req: AuthedRequest, res) => {

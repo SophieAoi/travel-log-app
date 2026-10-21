@@ -47,8 +47,10 @@ export const api = {
   login: (data: { email: string; password: string }) =>
     request("/auth/login", { method: "POST", body: JSON.stringify(data) }),
   getMe: () => request("/auth/me"),
-  updateProfile: (data: { bio?: string; displayName?: string }) =>
+  updateProfile: (data: { bio?: string; displayName?: string; email?: string }) =>
     request("/auth/me", { method: "PATCH", body: JSON.stringify(data) }),
+  changePassword: (data: { currentPassword: string; newPassword: string }) =>
+    request("/auth/me/password", { method: "PATCH", body: JSON.stringify(data) }),
   uploadAvatar: (file: File) => {
     const form = new FormData();
     form.append("file", file);
