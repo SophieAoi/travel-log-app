@@ -11,6 +11,7 @@ import { Places } from "./pages/Places";
 import { PlaceDetail } from "./pages/PlaceDetail";
 import { CountryAlbum } from "./pages/CountryAlbum";
 import { SharedPlace } from "./pages/SharedPlace";
+import { Settings } from "./pages/Settings";
 import "./App.css";
 
 function App() {
@@ -73,6 +74,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PlaceDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <Settings />
                 </ProtectedRoute>
               }
             />

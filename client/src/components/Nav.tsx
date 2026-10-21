@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Globe2, MapPinned, LogOut } from "lucide-react";
+import { Home, Globe2, MapPinned, Settings, LogOut } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { Logo } from "./Logo";
 
