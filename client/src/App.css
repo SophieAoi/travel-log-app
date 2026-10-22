@@ -24,14 +24,15 @@
   --color-text: #24211d;
   --color-muted: #837c72;
   --color-border: #ece5d8;
-  --color-accent: #0cb7b0;
-  --color-accent-dark: #0a938e;
-  --color-accent-soft: #e0f7f5;
-  --color-coral: #f2704a;
-  --color-coral-soft: #fdece5;
+  --color-neutral-hover: #e4e1dc;
+  --color-accent: #a870b0;
+  --color-accent-dark: #8a5793;
+  --color-accent-soft: #f3e9f5;
+  --color-coral: #c98fae;
+  --color-coral-soft: #f7ecf2;
   --color-error: #c8402f;
-  --gradient-vivid: linear-gradient(135deg, #0cb7b0 0%, #4fc7bd 22%, #ec6fa8 55%, #f68fb0 72%, #ffcb5c 100%);
-  --gradient-vivid-soft: linear-gradient(135deg, #e2faf7 0%, #e9f9f6 22%, #fdecf3 55%, #fef0f2 72%, #fff8e3 100%);
+  --gradient-vivid: linear-gradient(135deg, #9a7fc4 0%, #b082bd 35%, #c789b5 65%, #d998a8 100%);
+  --gradient-vivid-soft: linear-gradient(135deg, #eeeafa 0%, #f1e9f5 35%, #f6ebf1 65%, #faeeea 100%);
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 22px;
@@ -178,8 +179,8 @@ a {
 }
 
 .sidebar-link.active {
-  background: var(--gradient-vivid);
-  color: white;
+  background: var(--color-neutral-hover);
+  color: var(--color-text);
 }
 
 .sidebar-bottom {
