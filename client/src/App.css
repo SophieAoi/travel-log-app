@@ -2183,3 +2183,67 @@ button.ghost-danger:hover {
   font-weight: 500;
   animation: fade-in 0.2s var(--ease);
 }
+
+/* Boards grid */
+
+.board-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.25rem;
+}
+
+.board-card {
+  animation: fade-up 0.35s var(--ease) both;
+}
+
+.board-card a {
+  display: block;
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.board-cover {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+.board-card a:hover .board-cover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.board-cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.board-card-body {
+  padding: 0.6rem 0.1rem 0;
+}
+
+.board-card-body h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.1rem;
+  font-size: 0.95rem;
+}
+
+.board-card-body .muted {
+  font-size: 0.82rem;
+}
