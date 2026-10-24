@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Globe2, MapPinned, Settings, LogOut } from "lucide-react";
+import { Home, Globe2, MapPinned, LayoutGrid, Settings, LogOut } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { Logo } from "./Logo";
 
@@ -41,6 +41,13 @@ export function Nav() {
           title="Places"
         >
           <MapPinned size={22} />
+        </Link>
+        <Link
+          to="/boards"
+          className={`sidebar-link ${location.pathname.startsWith("/boards") ? "active" : ""}`}
+          title="Boards"
+        >
+          <LayoutGrid size={22} />
         </Link>
       </div>
 

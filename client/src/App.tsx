@@ -10,6 +10,8 @@ import { Countries } from "./pages/Countries";
 import { Places } from "./pages/Places";
 import { PlaceDetail } from "./pages/PlaceDetail";
 import { CountryAlbum } from "./pages/CountryAlbum";
+import { Boards } from "./pages/Boards";
+import { BoardAlbum } from "./pages/BoardAlbum";
 import { SharedPlace } from "./pages/SharedPlace";
 import { Settings } from "./pages/Settings";
 import "./App.css";
@@ -74,6 +76,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PlaceDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/boards"
+              element={
+                <ProtectedRoute>
+                  <Boards />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/boards/:tag"
+              element={
+                <ProtectedRoute>
+                  <BoardAlbum />
                 </ProtectedRoute>
               }
             />
