@@ -1639,6 +1639,7 @@ button.ghost-danger:hover {
   gap: 0.5rem;
   background: none;
   padding: 0;
+  margin-top: 0.75rem;
   margin-bottom: 1rem;
   align-items: center;
 }
@@ -1839,7 +1840,7 @@ button.ghost-danger:hover {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  margin-top: 1rem;
+  margin: 1rem 0 0;
   padding: 0.4rem 0.8rem;
   border-radius: 999px;
   font-size: 0.82rem;
