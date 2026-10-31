@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { X, ChevronLeft, ChevronRight, Check, Pencil } from "lucide-react";
 import { api } from "../api/client";
 
@@ -33,10 +33,22 @@ export function PhotoLightbox({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(current?.caption ?? "");
   const [saving, setSaving] = useState(false);
+  const mediaRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
+  const [frameWidth, setFrameWidth] = useState<number | null>(null);
 
   useEffect(() => {
     setEditing(false);
     setDraft(current?.caption ?? "");
+  }, [current?.id]);
+
+  useLayoutEffect(() => {
+    const el = mediaRef.current;
+    if (!el) return;
+    const measure = () => setFrameWidth(el.getBoundingClientRect().width);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
   }, [current?.id]);
 
   useEffect(() => {
@@ -100,47 +112,54 @@ export function PhotoLightbox({
       )}
 
       <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-        <div className="lightbox-media">
-          {current.type === "PHOTO" ? (
-            <img src={`${API_BASE}${current.url}`} alt="" />
-          ) : (
-            <video src={`${API_BASE}${current.url}`} controls autoPlay />
-          )}
-        </div>
-
-        {!readOnly && (
-          <div className="lightbox-caption-bar">
-            {editing ? (
-              <div className="lightbox-caption-edit">
-                <textarea
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value.slice(0, CAPTION_MAX))}
-                  placeholder="Add a caption..."
-                  rows={2}
-                  autoFocus
-                />
-                <div className="lightbox-caption-actions">
-                  <span className="bio-char-count">
-                    {draft.length}/{CAPTION_MAX}
-                  </span>
-                  <button className="icon-only-button secondary" onClick={() => setEditing(false)} type="button">
-                    <X size={14} />
-                  </button>
-                  <button className="icon-only-button" onClick={saveCaption} disabled={saving} type="button">
-                    <Check size={14} />
-                  </button>
-                </div>
-              </div>
+        <div className="lightbox-frame" style={frameWidth ? { width: frameWidth } : undefined}>
+          <div className="lightbox-media">
+            {current.type === "PHOTO" ? (
+              <img ref={mediaRef as React.RefObject<HTMLImageElement>} src={`${API_BASE}${current.url}`} alt="" />
             ) : (
-              <button className="lightbox-caption-button" onClick={() => setEditing(true)} type="button">
-                <span>{current.caption || "Add a caption..."}</span>
-                <Pencil size={12} />
-              </button>
+              <video
+                ref={mediaRef as React.RefObject<HTMLVideoElement>}
+                src={`${API_BASE}${current.url}`}
+                controls
+                autoPlay
+              />
             )}
           </div>
-        )}
 
-        {readOnly && current.caption && <p className="lightbox-caption-readonly">{current.caption}</p>}
+          {!readOnly && (
+            <div className="lightbox-caption-bar">
+              {editing ? (
+                <div className="lightbox-caption-edit">
+                  <textarea
+                    value={draft}
+                    onChange={(e) => setDraft(e.target.value.slice(0, CAPTION_MAX))}
+                    placeholder="Add a caption..."
+                    rows={2}
+                    autoFocus
+                  />
+                  <div className="lightbox-caption-actions">
+                    <span className="bio-char-count">
+                      {draft.length}/{CAPTION_MAX}
+                    </span>
+                    <button className="icon-only-button secondary" onClick={() => setEditing(false)} type="button">
+                      <X size={14} />
+                    </button>
+                    <button className="icon-only-button" onClick={saveCaption} disabled={saving} type="button">
+                      <Check size={14} />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button className="lightbox-caption-button" onClick={() => setEditing(true)} type="button">
+                  <span>{current.caption || "Add a caption..."}</span>
+                  <Pencil size={12} />
+                </button>
+              )}
+            </div>
+          )}
+
+          {readOnly && current.caption && <p className="lightbox-caption-readonly">{current.caption}</p>}
+        </div>
       </div>
     </div>
   );

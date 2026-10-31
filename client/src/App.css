@@ -1998,8 +1998,6 @@ button.ghost-danger:hover {
 
 .lightbox-content {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   max-width: min(90vw, 900px);
   max-height: 90vh;
   background: var(--color-surface);
@@ -2008,10 +2006,13 @@ button.ghost-danger:hover {
   box-shadow: var(--shadow-lg);
 }
 
-.lightbox-media {
+.lightbox-frame {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  max-width: 100%;
+}
+
+.lightbox-media {
   max-height: 72vh;
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -2022,6 +2023,8 @@ button.ghost-danger:hover {
 .lightbox-media video {
   max-width: 100%;
   max-height: 72vh;
+  width: auto;
+  height: auto;
   display: block;
   object-fit: contain;
 }
@@ -2036,6 +2039,7 @@ button.ghost-danger:hover {
   align-items: center;
   gap: 0.5rem;
   width: 100%;
+  min-width: 0;
   background: var(--color-bg);
   color: var(--color-muted);
   font-weight: 400;
@@ -2054,10 +2058,15 @@ button.ghost-danger:hover {
 
 .lightbox-caption-button span {
   flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .lightbox-caption-edit textarea {
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 0.6rem 0.8rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
